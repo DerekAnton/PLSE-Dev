@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PLSE Project", "PLSE Project\PLSE Project\PLSE Project.csproj", "{E631CCC7-FC77-476E-9DB6-51837E22530F}"
+EndProject
+Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "PLSE ProjectContent", "PLSE Project\PLSE ProjectContent\PLSE ProjectContent.contentproj", "{EF797030-D1D0-48B5-BCC2-8B31E9F44CD8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E631CCC7-FC77-476E-9DB6-51837E22530F}.Debug|x86.ActiveCfg = Debug|x86
+		{E631CCC7-FC77-476E-9DB6-51837E22530F}.Debug|x86.Build.0 = Debug|x86
+		{E631CCC7-FC77-476E-9DB6-51837E22530F}.Release|x86.ActiveCfg = Release|x86
+		{E631CCC7-FC77-476E-9DB6-51837E22530F}.Release|x86.Build.0 = Release|x86
+		{EF797030-D1D0-48B5-BCC2-8B31E9F44CD8}.Debug|x86.ActiveCfg = Debug|x86
+		{EF797030-D1D0-48B5-BCC2-8B31E9F44CD8}.Release|x86.ActiveCfg = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
