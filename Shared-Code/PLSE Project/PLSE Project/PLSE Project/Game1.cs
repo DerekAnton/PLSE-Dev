@@ -19,9 +19,12 @@ namespace PLSE_Project
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        Hero hero = new Hero();
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            this.IsMouseVisible = true;
             Content.RootDirectory = "Content";
         }
 
@@ -47,6 +50,9 @@ namespace PLSE_Project
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            hero.load(Content);
+            hero.setRect(0, 0);
+
             // TODO: use this.Content to load your game content here
         }
 
@@ -69,9 +75,11 @@ namespace PLSE_Project
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
+            KeyboardState keyState = Keyboard.GetState();
+
+            hero.update(gameTime.ElapsedGameTime.Milliseconds, keyState);
 
             // TODO: Add your update logic here
-
             base.Update(gameTime);
         }
 
@@ -83,7 +91,11 @@ namespace PLSE_Project
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin();
+
+            hero.draw(spriteBatch);
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
