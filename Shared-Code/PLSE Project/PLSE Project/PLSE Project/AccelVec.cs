@@ -11,5 +11,6 @@ namespace PLSE_Project
 {
     class AccelVec
     {
+
     }
 }
