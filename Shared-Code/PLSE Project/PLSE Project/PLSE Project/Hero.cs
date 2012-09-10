@@ -13,17 +13,18 @@ using Microsoft.Xna.Framework.Media;
 
 namespace PLSE_Project
 {
-    class Hero
+    class Hero : Colideable
     {
-        Texture2D texture;
-        string imgPath = "Sprites//Hero//Sanic";
-        Rectangle rect;
+        private Texture2D texture;
+        private string imgPath = "Sprites//Hero//Sanic";
+        private Rectangle rect;
 
         public Hero(){}
 
-        public void load(ContentManager content)
+        public void load(ContentManager content, int x, int y)
         {
             texture = content.Load<Texture2D>(imgPath);
+            rect = new Rectangle(x, y, texture.Width, texture.Height);
         }
 
         public void update(double elapsedTime, KeyboardState keyState)
@@ -50,6 +51,21 @@ namespace PLSE_Project
         public void setRect(int x, int y)
         {
             rect = new Rectangle(x, y, texture.Width, texture.Height);
+        }
+
+        public bool intersects(Rectangle rectangle)
+        {
+            return rect.Intersects(rectangle);
+        }
+
+        public bool intersects(Colideable obj)
+        {
+            return rect.Intersects(obj.getRect());
+        }
+
+        public Rectangle getRect()
+        {
+            return rect;
         }
     }
 }

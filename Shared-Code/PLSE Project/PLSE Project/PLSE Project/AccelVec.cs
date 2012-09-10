@@ -11,6 +11,45 @@ namespace PLSE_Project
 {
     class AccelVec
     {
+        private Vector2 vec;
+        private double decayTimer = 0;
+        private bool active = false;
 
+        //For forces that have a time duration that will eventually stop
+        public AccelVec(float shiftX, float shiftY, double decayTime)
+        {
+            active = true;
+            vec = new Vector2(shiftX, shiftY);
+            decayTimer = decayTime;
+        }
+
+        //For forces that will be constantly applied ex: gravity
+        public AccelVec(float shiftX, float shiftY)
+        {
+            active = true;
+            vec = new Vector2(shiftX, shiftY);
+            decayTimer = 0;
+        }
+
+        public float getShiftX()
+        {
+            return vec.X;
+        }
+
+        public float getShiftY()
+        {
+            return vec.Y;
+        }
+
+        public void update(double elapsedTime)
+        {
+            decayTimer -= elapsedTime;
+            active = decayTimer <= 0;
+        }
+
+        public bool isActive()
+        {
+            return active;
+        }
     }
 }

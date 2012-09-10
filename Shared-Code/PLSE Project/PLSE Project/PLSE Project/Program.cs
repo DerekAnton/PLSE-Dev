@@ -7,7 +7,7 @@ namespace PLSE_Project
     {
         static void Main(string[] args)
         {
-            using (Game1 game = new Game1())
+            using (PhysicsPlayground game = new PhysicsPlayground())
             {
                 game.Run();
             }
