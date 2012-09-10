@@ -6,10 +6,19 @@ namespace PLSE_Project
     interface Colideable
     {
          bool intersects(Rectangle rect);
+         //{
+         //   return rect.Intersects(rectangle);
+         //}
 
         //Allows objects that implement colidable to be compared to one another easily
         bool intersects(Colideable obj);
+        //{
+        //    return rect.Intersects(obj.getRect());
+        //}
 
         Rectangle getRect();
+        //{
+        //    return rect;
+        //} 
     }
 }

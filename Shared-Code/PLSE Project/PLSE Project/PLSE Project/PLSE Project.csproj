@@ -110,6 +110,7 @@
     <Compile Include="AccelVec.cs" />
     <Compile Include="Hero.cs" />
     <Compile Include="Colideable.cs" />
+    <Compile Include="Obstacle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="PhysicsPlayground.cs" />
