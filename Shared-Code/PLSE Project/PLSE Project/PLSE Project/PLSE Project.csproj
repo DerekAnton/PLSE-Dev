@@ -108,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccelVec.cs" />
+    <Compile Include="Direction.cs" />
     <Compile Include="Hero.cs" />
     <Compile Include="Colideable.cs" />
     <Compile Include="Obstacle.cs" />

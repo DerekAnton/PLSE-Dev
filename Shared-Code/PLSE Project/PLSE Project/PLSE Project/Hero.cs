@@ -13,6 +13,19 @@ namespace PLSE_Project
         private Texture2D texture;
         private string imgPath = "Sprites//Hero//Sanic";
         private Rectangle rect;
+        private Vector2 origin;
+
+        private const int maxJumpCount = 2;
+        private int jumpCount = maxJumpCount;
+        private const double jumpTime = 1500;
+        private const float jumpSpeed = 5.0f;
+        private bool jumping = false;
+        private AccelVec jumpVec;
+        private bool onGround = false;
+
+        private const float speed = 3.0f;
+
+        private Direction facingDirection;
 
         public Hero(){}
 
@@ -35,13 +48,53 @@ namespace PLSE_Project
 
         public Vector2 getOrigin()
         {
-            return new Vector2(rect.Center.X, rect.Center.Y);
+            return origin;
         }
 
         private void move(KeyboardState keyState, KeyboardState oldKeyState, double elapsedTime)
         {
+            //Code for which way the character should be facing will go here.
+
+            if(keyState.IsKeyDown(Keys.W))
+                jump();
+
+            if (keyState.IsKeyDown(Keys.S) && onGround)
+                crouch();
+        }
+
+        
+
+        private void attack()
+        {
+        }
+
+        private void shiftX(double amount)
+        {
+        }
+
+        private void shiftY(double amount)
+        {
+        }
+
+        private void setAimDirection(KeyboardState keyState, MouseState mouseState)
+        {
 
         }
+
+        private void jump()
+        {
+            if (jumpCount > 0)
+            {
+                jumpCount--;
+                jumpVec = new AccelVec(0, jumpSpeed, jumpTime);
+                jumping = true;
+            }
+        }
+
+        private void crouch()
+        {
+        }
+
 
         public void setRect(int x, int y)
         {
