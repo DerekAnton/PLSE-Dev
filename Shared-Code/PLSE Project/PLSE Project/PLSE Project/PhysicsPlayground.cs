@@ -38,7 +38,7 @@ namespace PLSE_Project
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            hero.load(Content, 0, 0);
+            hero.load(Content, 400, 400);
         }
 
         protected override void UnloadContent()
@@ -52,8 +52,9 @@ namespace PLSE_Project
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
             KeyboardState keyState = Keyboard.GetState();
+            MouseState mouseState = Mouse.GetState();
 
-            hero.update(gameTime.ElapsedGameTime.Milliseconds, keyState);
+            hero.update(gameTime.ElapsedGameTime.Milliseconds, keyState, mouseState);
 
             base.Update(gameTime);
         }

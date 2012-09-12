@@ -15,6 +15,8 @@ namespace PLSE_Project
         private Rectangle rect;
         private Vector2 origin;
 
+        private Rectangle sourceRect = new Rectangle(0,0,50,58);
+
         private const int maxJumpCount = 2;
         private int jumpCount = maxJumpCount;
         private const double jumpTime = 1500;
@@ -26,6 +28,7 @@ namespace PLSE_Project
         private const float speed = 3.0f;
 
         private Direction facingDirection;
+        Vector2 aimVec;
 
         public Hero(){}
 
@@ -33,16 +36,19 @@ namespace PLSE_Project
         {
             texture = content.Load<Texture2D>(imgPath);
             rect = new Rectangle(x, y, texture.Width, texture.Height);
+            origin = new Vector2(rect.Center.X, rect.Center.Y);
         }
 
-        public void update(double elapsedTime, KeyboardState keyState)
+        public void update(double elapsedTime, KeyboardState keyState, MouseState mouseState)
         {
 
         }
 
         public void draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(texture, rect, Color.White);
+            //spriteBatch.Draw(texture, rect, Color.White);
+            spriteBatch.Draw(texture, rect, sourceRect, Color.White, MathHelper.ToRadians(180.0f), origin, SpriteEffects.None, 1);
+            int y = 7;
         }
 
 
@@ -78,6 +84,17 @@ namespace PLSE_Project
 
         private void setAimDirection(KeyboardState keyState, MouseState mouseState)
         {
+            if (mouseState.X >= origin.X)
+                facingDirection = Direction.Right;
+            else
+                facingDirection = Direction.Left;
+
+            float distX = mouseState.X - origin.X;
+            float distY = origin.Y - mouseState.Y;
+
+            aimVec = new Vector2(distX / (distX + distY), distY / (distX + distY));
+
+            
 
         }
 
