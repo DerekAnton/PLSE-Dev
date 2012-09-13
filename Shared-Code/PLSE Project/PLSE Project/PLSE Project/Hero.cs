@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+
 
 
 
@@ -10,6 +12,14 @@ namespace PLSE_Project
 {
     class Hero : Colideable
     {
+
+        private float rotation = 0f; // Danton
+        Vector2 mousePosition = new Vector2(0, 0); // Danton
+        Vector2 sanicDirection = new Vector2(0, 0); // Danton
+
+
+
+
         private Texture2D texture;
         private string imgPath = "Sprites//Hero//Sanic";
         private Rectangle rect;
@@ -41,14 +51,16 @@ namespace PLSE_Project
 
         public void update(double elapsedTime, KeyboardState keyState, MouseState mouseState)
         {
-
+            mousePosition.X = mouseState.X; // Danton
+            mousePosition.Y = mouseState.Y; // Danton
+            sanicDirection = mousePosition - origin; // Danton
+            sanicDirection.Normalize();  // Danton
+            rotation = (float)Math.Atan2((double)sanicDirection.Y, (double)sanicDirection.X);  // Danton
         }
 
         public void draw(SpriteBatch spriteBatch)
         {
-            //spriteBatch.Draw(texture, rect, Color.White);
-            spriteBatch.Draw(texture, rect, sourceRect, Color.White, MathHelper.ToRadians(180.0f), origin, SpriteEffects.None, 1);
-            int y = 7;
+            spriteBatch.Draw(texture, origin, null, Color.White, rotation, new Vector2(texture.Width / 2, texture.Height / 2), 1.0f, SpriteEffects.None, 1.0f);  // Danton
         }
 
 
