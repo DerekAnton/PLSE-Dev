@@ -18,6 +18,9 @@ namespace PLSE_Project
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        Viewport viewport;
+        Rectangle viewportRect;
+
         Hero hero = new Hero();
 
         public PhysicsPlayground()
@@ -38,6 +41,9 @@ namespace PLSE_Project
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            viewport = graphics.GraphicsDevice.Viewport;
+            viewportRect = viewport.Bounds;
+
             hero.load(Content, 100, 100);
         }
 
@@ -54,7 +60,7 @@ namespace PLSE_Project
             KeyboardState keyState = Keyboard.GetState();
             MouseState mouseState = Mouse.GetState();
 
-            hero.update(gameTime.ElapsedGameTime.Milliseconds, keyState, mouseState);
+            hero.update(gameTime.ElapsedGameTime.Milliseconds, keyState, mouseState, viewportRect);
 
             base.Update(gameTime);
         }

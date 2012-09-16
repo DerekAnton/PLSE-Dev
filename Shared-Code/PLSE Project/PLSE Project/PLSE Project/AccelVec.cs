@@ -31,6 +31,13 @@ namespace PLSE_Project
             decayTimer = 0;
         }
 
+        public AccelVec(Vector2 accelerationVector)
+        {
+            active = true;
+            vec = accelerationVector;
+            decayTimer = 0;
+        }
+
         public float getShiftX()
         {
             return vec.X;
@@ -44,12 +51,23 @@ namespace PLSE_Project
         public void update(double elapsedTime)
         {
             decayTimer -= elapsedTime;
-            active = decayTimer <= 0;
+            active = decayTimer > 0;
+            Console.WriteLine(decayTimer + " : " + active);
         }
 
         public bool isActive()
         {
             return active;
+        }
+
+        public void setVec(float X, float Y)
+        {
+            vec = new Vector2(X, Y);
+        }
+
+        public void setVec(Vector2 newVec)
+        {
+            vec = newVec;
         }
     }
 }
