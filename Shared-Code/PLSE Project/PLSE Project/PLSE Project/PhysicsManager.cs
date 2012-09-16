@@ -10,7 +10,9 @@ namespace PLSE_Project
     class PhysicsManager
     {
         private static PhysicsManager physicsManager;
-        private static AccelVec gravity = new AccelVec(0,0.5f);
+        private const float defaultGrav = 0.5f;
+        private static AccelVec gravity = new AccelVec(0,defaultGrav);
+        
 
         private PhysicsManager() {}
 
@@ -36,7 +38,7 @@ namespace PLSE_Project
 
         public static void reset()
         {
-            gravity.setVec(0, -9.0f);
+            gravity.setVec(0, defaultGrav);
         }
 
         public static AccelVec getGravity()

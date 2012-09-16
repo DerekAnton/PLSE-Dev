@@ -13,9 +13,11 @@ namespace PLSE_Project
     class Hero : Colideable
     {
 
-        private float rotation = 0f; // Danton
-        Vector2 mousePosition = new Vector2(0, 0); // Danton
-        Vector2 sanicDirection = new Vector2(0, 0); // Danton
+        private float rotation = 0f;  
+        Vector2 mousePosition = new Vector2(0, 0);  
+        Vector2 sanicDirection = new Vector2(0, 0);  
+
+        
         
         private Texture2D texture;
         private string imgPath = "Sprites//Hero//Sanic";
@@ -48,11 +50,11 @@ namespace PLSE_Project
 
         public void update(double elapsedTime, KeyboardState keyState, MouseState mouseState, Rectangle viewportRect)
         {
-            mousePosition.X = mouseState.X; // Danton
-            mousePosition.Y = mouseState.Y; // Danton
-            sanicDirection = mousePosition - origin; // Danton
-            sanicDirection.Normalize();  // Danton
-            rotation = (float)Math.Atan2((double)sanicDirection.Y, (double)sanicDirection.X);  // Danton
+            mousePosition.X = mouseState.X;  
+            mousePosition.Y = mouseState.Y;  
+            sanicDirection = mousePosition - origin;  
+            sanicDirection.Normalize();   
+            rotation = (float)Math.Atan2((double)sanicDirection.Y, (double)sanicDirection.X);   
 
             if (jumping)
             {
@@ -65,7 +67,7 @@ namespace PLSE_Project
 
         public void draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(texture, origin, null, Color.White, rotation, new Vector2(texture.Width / 2, texture.Height / 2), 1.0f, SpriteEffects.None, 1.0f);  // Danton
+            spriteBatch.Draw(texture, origin, null, Color.White, rotation, new Vector2(texture.Width / 2, texture.Height / 2), 1.0f, SpriteEffects.None, 1.0f);   
         }
 
 
@@ -157,8 +159,8 @@ namespace PLSE_Project
 
         private void crouch()
         {
-        }
 
+        }
 
         public void setRect(int x, int y)
         {
