@@ -12,19 +12,21 @@ namespace PLSE_Project
 {
     class Hero : Colideable
     {
+        bool spriteFlipping = false;
+        bool flipLocked = false;
 
-        private float rotation = 0f;  
-        Vector2 mousePosition = new Vector2(0, 0);  
-        Vector2 sanicDirection = new Vector2(0, 0);  
+        private float rotation = 0f;
+        Vector2 mousePosition = new Vector2(0, 0);
+        Vector2 heroDirection = new Vector2(0, 0);
 
-        
-        
+
+
         private Texture2D texture;
         private string imgPath = "Sprites//Hero//Sanic";
         private Rectangle rect;
         private Vector2 origin;
 
-        private Rectangle sourceRect = new Rectangle(0,0,50,58);
+        private Rectangle sourceRect = new Rectangle(0, 0, 50, 58);
 
         private const int maxJumpCount = 1;
         private int jumpCount = maxJumpCount;
@@ -39,7 +41,7 @@ namespace PLSE_Project
         private Direction facingDirection;
         Vector2 aimVec;
 
-        public Hero(){}
+        public Hero() { }
 
         public void load(ContentManager content, int x, int y)
         {
@@ -50,11 +52,19 @@ namespace PLSE_Project
 
         public void update(double elapsedTime, KeyboardState keyState, MouseState mouseState, Rectangle viewportRect)
         {
-            mousePosition.X = mouseState.X;  
-            mousePosition.Y = mouseState.Y;  
-            sanicDirection = mousePosition - origin;  
-            sanicDirection.Normalize();   
-            rotation = (float)Math.Atan2((double)sanicDirection.Y, (double)sanicDirection.X);   
+            mousePosition.X = mouseState.X;
+            mousePosition.Y = mouseState.Y;
+            heroDirection = mousePosition - origin;
+            heroDirection.Normalize();
+            rotation = (float)Math.Atan2((double)heroDirection.Y, (double)heroDirection.X); 
+
+            if ((Math.Abs(heroDirection.X) <= 0.03 && Math.Abs(heroDirection.X) >= 0.01) && !flipLocked) // need a last position of the mouse to be able to reference which direction is was coming from, left or right? (y < 130 || y > 130)
+            {
+                spriteFlipping = !spriteFlipping;
+                flipLocked = true;
+            }
+            else
+                flipLocked = false;
 
             if (jumping)
             {
@@ -67,7 +77,12 @@ namespace PLSE_Project
 
         public void draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(texture, origin, null, Color.White, rotation, new Vector2(texture.Width / 2, texture.Height / 2), 1.0f, SpriteEffects.None, 1.0f);   
+            if (!spriteFlipping)
+                spriteBatch.Draw(texture, origin, null, Color.White, rotation, new Vector2(texture.Width / 2, texture.Height / 2), 1.0f, SpriteEffects.None, 1.0f);
+            else
+                spriteBatch.Draw(texture, origin, null, Color.White, rotation, new Vector2(texture.Width / 2, texture.Height / 2), 1.0f, SpriteEffects.FlipVertically, 1.0f);
+
+
         }
 
 
@@ -80,7 +95,7 @@ namespace PLSE_Project
         {
             //Code for which way the character should be facing + aiming will go here.
 
-            if(keyState.IsKeyDown(Keys.W))
+            if (keyState.IsKeyDown(Keys.W))
                 jump();
 
             if (keyState.IsKeyDown(Keys.S) && onGround)
