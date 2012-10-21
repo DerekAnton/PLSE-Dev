@@ -1,6 +1,6 @@
 using System;
 
-namespace PLSE_Project
+namespace PLSE_Project.Interfaces
 {
 #if WINDOWS || XBOX
     static class Program

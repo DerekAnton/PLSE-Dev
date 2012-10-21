@@ -114,6 +114,7 @@
     <Compile Include="Direction.cs" />
     <Compile Include="Hero.cs" />
     <Compile Include="Colideable.cs" />
+    <Compile Include="BodyPart.cs" />
     <Compile Include="Obstacle.cs" />
     <Compile Include="PhysicsManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

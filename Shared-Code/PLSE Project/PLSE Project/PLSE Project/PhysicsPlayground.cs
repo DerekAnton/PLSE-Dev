@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 
-namespace PLSE_Project
+namespace PLSE_Project.Interfaces
 {
 
     public class PhysicsPlayground : Microsoft.Xna.Framework.Game
@@ -61,7 +61,7 @@ namespace PLSE_Project
             KeyboardState keyState = Keyboard.GetState();
             MouseState mouseState = Mouse.GetState();
 
-            hero.update(gameTime.ElapsedGameTime.Milliseconds, keyState, mouseState, viewportRect);
+            hero.update(gameTime.ElapsedGameTime.Milliseconds, keyState, mouseState, viewportRect, gameTime); // Passed GameTime, The first parameter is only the first 16 miliseconds of the game that never updates...
 
             base.Update(gameTime);
         }
@@ -72,7 +72,7 @@ namespace PLSE_Project
 
             spriteBatch.Begin();
 
-            hero.draw(spriteBatch);
+            hero.draw(spriteBatch); 
 
             spriteBatch.End();
             base.Draw(gameTime);
