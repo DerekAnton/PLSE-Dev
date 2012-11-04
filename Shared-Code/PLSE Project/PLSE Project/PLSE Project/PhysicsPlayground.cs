@@ -17,12 +17,18 @@ namespace PLSE_Project.Interfaces
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        
+        KeyboardState keyState;
+        KeyboardState oldKeyState;
 
 
         Viewport viewport;
         Rectangle viewportRect;
 
         Hero hero = new Hero();
+
+        Platform floor;
+        Platform obstacle;
 
         public PhysicsPlayground()
         {
@@ -46,6 +52,12 @@ namespace PLSE_Project.Interfaces
             viewportRect = viewport.Bounds;
 
             hero.load(Content, 100, 100);
+            floor = new Platform(Content, "platform");
+            obstacle = new Platform(Content, "obstacle");
+            hero.passPlatform(floor, obstacle);
+
+            hero.standingHitbox.X = (int)hero.body.position.X - 70;
+            hero.standingHitbox.Y = (int)hero.body.position.Y - 43;
         }
 
         protected override void UnloadContent()
@@ -58,10 +70,15 @@ namespace PLSE_Project.Interfaces
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
-            KeyboardState keyState = Keyboard.GetState();
+
+            oldKeyState = keyState;
+            keyState = Keyboard.GetState();
+
             MouseState mouseState = Mouse.GetState();
 
-            hero.update(gameTime.ElapsedGameTime.Milliseconds, keyState, mouseState, viewportRect, gameTime); // Passed GameTime, The first parameter is only the first 16 miliseconds of the game that never updates...
+            hero.update(gameTime.ElapsedGameTime.Milliseconds, keyState, oldKeyState, viewportRect, gameTime); // Passed GameTime, The first parameter is only the first 16 miliseconds of the game that never updates...
+            floor.update();
+
 
             base.Update(gameTime);
         }
@@ -72,7 +89,22 @@ namespace PLSE_Project.Interfaces
 
             spriteBatch.Begin();
 
-            hero.draw(spriteBatch); 
+            hero.updateHitboxes();
+
+            floor.draw(spriteBatch);
+            obstacle.draw(spriteBatch);
+            hero.draw(spriteBatch);
+
+            // THIS IS FOR DEBUGGING HITBOXES , TAKE ME OUT //
+            /*
+            Texture2D rect = new Texture2D(graphics.GraphicsDevice, hero.standingHitbox.Width, hero.standingHitbox.Height);
+            Color[] data = new Color[hero.standingHitbox.Width * hero.standingHitbox.Height];
+            for (int i = 0; i < data.Length; ++i) data[i] = Color.Chocolate;
+            rect.SetData(data);
+            Vector2 coor = new Vector2(hero.standingHitbox.X, hero.standingHitbox.Y);
+            spriteBatch.Draw(rect, coor, Color.Chocolate);
+            */
+            // THIS IS FOR DEBUGGING HITBOXES , TAKE ME OUT //
 
             spriteBatch.End();
             base.Draw(gameTime);

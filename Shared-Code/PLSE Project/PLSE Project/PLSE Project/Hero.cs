@@ -14,49 +14,81 @@ using Microsoft.Xna.Framework.Media;
 
 namespace PLSE_Project.Interfaces
 {
-    public enum BodySpriteIndex { BodyCrouch, BodyUncrouch, BodyStillCrouch, BodyRun, BodyStill}; // order in which the sprite sheets will be stored in the Texture2D array inside of the BodyPart Obj
-    public enum LegSpriteIndex { LegCrouch, LegUncrouch, LegStillCrouch, LegRun, LegStill }; // Danton //
-    public enum HeroStates { StandStill, CrouchStill, CrouchWalking, Running};
+    public enum BodySpriteIndex { CrouchIdle, CrouchMagic, CrouchReload, CrouchShoot, Fall, GetHurt, HangIdle, Idle, IdleUp, Jump, Magic, MagicDown, MagicUp, PullTowards, PushAway, ReloadUp, Shoot, ShootDown, ShootUp }; 
+    public enum LegSpriteIndex { CrouchWalk, Fall, GetHurt, Idle, Jump, Running, CrouchIdle  }; 
+
+    public enum BodyTransitionIndex { Crouch, CrouchHolster, CrouchTurn, /*CrouchUnHolster,*/ Hoist, Holster, LowToMid, MidToLow, MidToUp, Turn, TurnDown, TurnUp, UnCrouch, /*UnHolster,*/ UpToMid, NULL };
+    public enum LegTransitionIndex { Crouch, EndRun, FallTurn, JumpTurn, StartRun, Turn, UnCrouch, NULL };
+
+    public enum SingleSheetIndex { /*TBA*/ };
+    public enum HeroStates { StandStill, CrouchStill, CrouchWalking, Running, Jumping};
 
     class Hero : Colideable
     {
+
+        private readonly int MILLISECOND_DELAY = 30; // used for frame limiting 
+
+        private Platform floor; // for debugging jumping & collision only //
+        private Platform obstacle; 
+
         // staging arrays for the start of a new BodyPart Object //
         private int amountOfSheets;
         private int[] frameAmounts; 
         private Rectangle[] frameRects;
         private string[] imgPaths;
-        private Vector2[] startingPos;
+        private Vector2 startingPos;
         private int[] spriteDelayTimes;
         private int movespeed = 5;
-        public Rectangle hitbox;
+        
+        public Rectangle standingHitbox = new Rectangle(50,50,70,145);
+        public Rectangle crouchingHitbox;
 
-        // hard coded values for the starting position of the leg sprites and the body sprites
-        private Vector2 legsStartPos = new Vector2(130,275);
+        private string bodyString = ""; 
+        private string legString = "";
+
+        public int legOffset = 0;
+        public int bodyOffset = 0;
+
+        // hard coded values for the starting position of the leg sprites and the body sprites //
+        private Vector2 legsStartPos = new Vector2(115,270);
         private Vector2 bodyStartPos = new Vector2(165,190);
 
-        BodyPart body; // Danton //
-        BodyPart legs;
+        public BodyPart body; 
+        public BodyPart legs;
+        BodyPart singleSheet; // the single sheet body part is important for crouching & hanging since the legs/body are one full piece //
+        public TransitionBodyPart bodyTransitions; // the transition body part will break up the sprite sheets that have to do with changing a state i.e. from idle to crouching needs an quick animation played over the hero to transition it smoothly.//
+        public TransitionBodyPart legsTransitions;
+
         HeroStates heroState = HeroStates.StandStill;
 
-        bool spriteFlipping = false; // Danton //
+        static public LegTransitionIndex currentLegTransition = LegTransitionIndex.NULL; // these two values will be stored with the corresponding int val of whatever transition animation needs to be played //
+        static public BodyTransitionIndex currentBodyTransition = BodyTransitionIndex.NULL; // //
+        static public bool singleAnimationLock = true;
+       
+        bool spriteFlipping = false; 
         bool crouching = false;
-
-        Vector2 mousePosition = new Vector2(0, 0);
-
-        private Rectangle rect; // old rect
-        private Vector2 origin; // old origin
 
         private const int maxJumpCount = 1;
         private int jumpCount = maxJumpCount;
         private const double jumpTime = 90;
         private const float jumpSpeed = 1.5f;
-        private bool jumping = false;
+        //private bool jumping = false;
         private AccelVec jumpVec;
-        private bool onGround = false;
+
+        // JUMPING VARIABLES //
+        private bool airborn = false;
+        private bool doubleJumping = false;
+        private bool falling = false;
+        private int jumpAcceleration = 0;
+        private int horizontalJumpInertia = 0;
+        private int frameLimiter = 0;
+
+        private bool onGround = true;
+        private bool isStandingHitbox = true; // only two types of hit boxes, standing and crouching, (crouching == !standing)
+        private bool offsetCheck = false;
+        private bool facingRight = true;
 
         private const float speed = 3.0f;
-
-        private Direction facingDirection;
 
         public Hero() { }
 
@@ -69,140 +101,375 @@ namespace PLSE_Project.Interfaces
             
             setLegHardCodedVals();
             legs = new BodyPart(content, amountOfSheets, frameAmounts, frameRects, imgPaths, startingPos, spriteDelayTimes);
-            
-            body.setCurrentActiveSprite((int)BodySpriteIndex.BodyStill);
-            legs.setCurrentActiveSprite((int)LegSpriteIndex.LegStill);
 
-            refreshHitbox();
+            setSingleSheetHardCodedVals();
+            singleSheet = new BodyPart(content, amountOfSheets, frameAmounts, frameRects, imgPaths, startingPos, spriteDelayTimes);
+
+            setBodyTransitionHardCodedValues();
+            bodyTransitions = new TransitionBodyPart(content, amountOfSheets, frameAmounts, frameRects, imgPaths, startingPos, spriteDelayTimes);
+
+            setLegsTransitionHardCodedValues();
+            legsTransitions = new TransitionBodyPart(content, amountOfSheets, frameAmounts, frameRects, imgPaths, startingPos, spriteDelayTimes);
+
+            body.setCurrentActiveSprite((int)BodySpriteIndex.Idle);
+            legs.setCurrentActiveSprite((int)LegSpriteIndex.Idle);
         }
 
-        public void update(double elapsedTime, KeyboardState keyState, MouseState mouseState, Rectangle viewportRect, GameTime gameTime)
+        public void update(double elapsedTime, KeyboardState keyState, KeyboardState oldKeyState, Rectangle viewportRect, GameTime gameTime)
         {
-            body.animate(gameTime);
-            legs.animate(gameTime);
+            handleFalling(gameTime);
+        
+            if (!(currentBodyTransition == BodyTransitionIndex.NULL))
+            {
+                bodyTransitions.animateUntilEndFrame(gameTime);
 
-            move(keyState, mouseState, viewportRect, elapsedTime, gameTime);
+                if (!(currentLegTransition == LegTransitionIndex.NULL))
+                    legsTransitions.animateUntilEndFrame(gameTime);
+                else
+                    legs.animate(gameTime);
+            }
+            else if (!(currentLegTransition == LegTransitionIndex.NULL))
+            {
+                legsTransitions.animateUntilEndFrame(gameTime);
+
+                if (!(currentBodyTransition == BodyTransitionIndex.NULL))
+                    bodyTransitions.animateUntilEndFrame(gameTime);
+                else
+                    body.animate(gameTime);
+            }
+            else
+            {
+                body.animate(gameTime);
+                legs.animate(gameTime);
+            }
+            move(keyState, oldKeyState, viewportRect, elapsedTime, gameTime);
         }
 
         public void draw(SpriteBatch spriteBatch)
         {
-            legs.draw(spriteBatch);
-            body.draw(spriteBatch);
-        }
-            
-        public Vector2 getOrigin()
-        {
-            return origin;
+            if (spriteFlipping)
+            {
+
+                if (!(currentBodyTransition == BodyTransitionIndex.NULL))
+                {
+                    bodyTransitions.draw(spriteBatch, spriteFlipping);
+
+                    if (!(currentLegTransition == LegTransitionIndex.NULL))
+                        legsTransitions.draw(spriteBatch, spriteFlipping);
+                    else
+                        legs.draw(spriteBatch, spriteFlipping);
+                }
+                else if (!(currentLegTransition == LegTransitionIndex.NULL))
+                {
+                    legsTransitions.draw(spriteBatch, spriteFlipping);
+
+                    if (!(currentBodyTransition == BodyTransitionIndex.NULL))
+                        bodyTransitions.draw(spriteBatch, spriteFlipping);
+                    else
+                        body.draw(spriteBatch, spriteFlipping);
+                }
+                else
+                {
+                    legs.draw(spriteBatch, spriteFlipping);
+                    body.draw(spriteBatch, spriteFlipping);
+                }
+            }
+            else
+            {
+
+                if (!(currentBodyTransition == BodyTransitionIndex.NULL))
+                {
+                    bodyTransitions.draw(spriteBatch, spriteFlipping);
+
+                    if (!(currentLegTransition == LegTransitionIndex.NULL))
+                        legsTransitions.draw(spriteBatch, spriteFlipping);
+                    else
+                        legs.draw(spriteBatch, spriteFlipping);
+                }
+                else if (!(currentLegTransition == LegTransitionIndex.NULL))
+                {
+                    legsTransitions.draw(spriteBatch, spriteFlipping);
+
+                    if (!(currentBodyTransition == BodyTransitionIndex.NULL))
+                        bodyTransitions.draw(spriteBatch, spriteFlipping);
+                    else
+                        body.draw(spriteBatch, spriteFlipping);
+                }
+                else
+                {
+                    legs.draw(spriteBatch, spriteFlipping);
+                    body.draw(spriteBatch, spriteFlipping);
+                }
+            }
         }
 
-        private void move(KeyboardState keyState, MouseState mouseState, Rectangle viewportRect, double elapsedTime, GameTime gameTime)
+        private void move(KeyboardState keyState, KeyboardState oldKeyState, Rectangle viewportRect, double elapsedTime, GameTime gameTime)
         {
-            
-            if (keyState.IsKeyDown(Keys.W))
+            //bodyTransitions.setPrintMe(true);
+            legsTransitions.setPrintMe(true);
+            body.setPrintMe(true);
+
+
+            if (keyState.IsKeyDown(Keys.Space))
+            {
                 jump();
+            }
 
-            if (keyState.IsKeyDown(Keys.S) && (!keyState.IsKeyDown(Keys.D) || !keyState.IsKeyDown(Keys.A)) && onGround) // case for crouchstill //
+            if (heroState == HeroStates.StandStill && !oldKeyState.IsKeyDown(Keys.Down) && keyState.IsKeyDown(Keys.Down)) // case for idle -> crouch transition
+                drawCrouchingTransition(keyState, oldKeyState);
+            if ((heroState == HeroStates.CrouchStill || heroState == HeroStates.CrouchWalking) && oldKeyState.IsKeyDown(Keys.Down) && keyState.IsKeyUp(Keys.Down)) // case for crouch/crouchwalking -> uncrouch transition
+                drawUnCrouchingTransition(keyState, oldKeyState);
+
+            if (keyState.IsKeyDown(Keys.Down) && (!keyState.IsKeyDown(Keys.Right) || !keyState.IsKeyDown(Keys.Left)) && onGround) // case for crouch //
             {
                 crouching = true;
                 heroState = HeroStates.CrouchStill;
-                body.setCurrentActiveSprite((int)BodySpriteIndex.BodyStillCrouch);
-                legs.setCurrentActiveSprite((int)LegSpriteIndex.LegStillCrouch);
-                refreshHitbox();
-            }
+                body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
+                legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
+                 
+                 
+                setCheckStrings("crouchidle");
 
-            if (keyState.IsKeyDown(Keys.S) && (keyState.IsKeyDown(Keys.D) || keyState.IsKeyDown(Keys.A))) // case for crouch walking //
+                //checkMidToUpConditions(keyState, oldKeyState);
+                //checkUpToMidConditions(keyState, oldKeyState);
+            }
+            
+            if (keyState.IsKeyDown(Keys.Down) && (keyState.IsKeyDown(Keys.Right) || keyState.IsKeyDown(Keys.Left)) && onGround) // case for moving into crouch  //
             {
-                crouching = true;
-                heroState = HeroStates.CrouchWalking;
-                body.setCurrentActiveSprite((int)BodySpriteIndex.BodyStillCrouch);
-                legs.setCurrentActiveSprite((int)LegSpriteIndex.LegStillCrouch);
-                refreshHitbox();
+                if (keyState.IsKeyDown(Keys.Left))
+                {
+                    spriteFlipping = true;
+                    setLegsOffsetTrue();
+                }
+                else
+                {
+                    spriteFlipping = false;
+                    setLegsOffsetFalse();
+                }
+
+                if (!oldKeyState.IsKeyDown(Keys.Down) && keyState.IsKeyDown(Keys.Down))
+                {
+                    drawCrouchingTransition(keyState, oldKeyState);
+                     
+                }
+                else
+                {
+                    crouching = true;
+                    heroState = HeroStates.CrouchWalking;
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
+                    legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
+                    //checkMidToUpConditions(keyState, oldKeyState);
+                    //checkUpToMidConditions(keyState, oldKeyState);
+                }
             }
 
-            if (keyState.IsKeyUp(Keys.S) && ((!keyState.IsKeyDown(Keys.D) || !keyState.IsKeyDown(Keys.A))) && onGround) // case for standing still //
+            if ( keyState.IsKeyUp(Keys.Down) &&  (!keyState.IsKeyDown(Keys.Right) || !keyState.IsKeyDown(Keys.Left)) && onGround) // case for standing still //
             {
                 crouching = false;
                 heroState = HeroStates.StandStill;
-                body.setCurrentActiveSprite((int)BodySpriteIndex.BodyStill);
-                legs.setCurrentActiveSprite((int)LegSpriteIndex.LegStill);
-                refreshHitbox();
+                body.setCurrentActiveSprite((int)BodySpriteIndex.Idle);
+                legs.setCurrentActiveSprite((int)LegSpriteIndex.Idle);
+                setCheckStrings("idle");
+                checkMidToUpConditions(keyState, oldKeyState);
+                checkUpToMidConditions(keyState, oldKeyState);
             }
 
-            if (keyState.IsKeyDown(Keys.D)) // case for walking right & crouch walking //
+            if (keyState.IsKeyDown(Keys.Right)) // case for walking right & crouch walking & pressing left and right //
             {
-                if (keyState.IsKeyDown(Keys.S))
+                if (keyState.IsKeyDown(Keys.Down))
                 {
+                    spriteFlipping = false;
+                    setLegsOffsetFalse();
+                    crouching = true;
                     heroState = HeroStates.CrouchWalking;
                     moveRight(gameTime);
-                    body.setCurrentActiveSprite((int)BodySpriteIndex.BodyStillCrouch);
-                    legs.setCurrentActiveSprite((int)LegSpriteIndex.LegStillCrouch);
-                    refreshHitbox();
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
+                    
+                    if(!keyState.IsKeyDown(Keys.Left))
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchWalk);
+                    else
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
+                   // checkMidToUpConditions(keyState, oldKeyState);
+                    //checkUpToMidConditions(keyState, oldKeyState);
+                }
+                else if(keyState.IsKeyDown(Keys.Left))
+                {
+                    crouching = false;
+                    heroState = HeroStates.StandStill;
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.Idle);
+
+                    if (!keyState.IsKeyDown(Keys.Down))
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.Idle);
+                    else
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
+                    checkMidToUpConditions(keyState, oldKeyState);
+                    checkUpToMidConditions(keyState, oldKeyState);
                 }
                 else
                 {
+                    spriteFlipping = false;
+                    setLegsOffsetFalse();
                     heroState = HeroStates.Running;
                     moveRight(gameTime);
-                    body.setCurrentActiveSprite((int)BodySpriteIndex.BodyRun);
-                    legs.setCurrentActiveSprite((int)LegSpriteIndex.LegRun);
-                    refreshHitbox();
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.Idle);
+                    legs.setCurrentActiveSprite((int)LegSpriteIndex.Running);                  
+                    checkMidToUpConditions(keyState, oldKeyState);
+                    checkUpToMidConditions(keyState, oldKeyState);
                 }
             }
-            if (keyState.IsKeyDown(Keys.A)) // case for walking left and crouching //
+            if (keyState.IsKeyDown(Keys.Left)) // case for walking left and crouching //
             {
-                if (keyState.IsKeyDown(Keys.S))
+                if (keyState.IsKeyDown(Keys.Down))
                 {
+                    spriteFlipping = true;
+                    setLegsOffsetTrue();
                     heroState = HeroStates.CrouchWalking;
                     moveLeft(gameTime);
-                    body.setCurrentActiveSprite((int)BodySpriteIndex.BodyStillCrouch);
-                    legs.setCurrentActiveSprite((int)LegSpriteIndex.LegStillCrouch);
-                    refreshHitbox();
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
+                    if(!keyState.IsKeyDown(Keys.Right))
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchWalk);
+                    else
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
+
+                    //checkMidToUpConditions(keyState, oldKeyState);
+                    //checkUpToMidConditions(keyState, oldKeyState);
+                }
+                else if (keyState.IsKeyDown(Keys.Right))
+                {
+                    crouching = false;
+                     
+                     
+                    heroState = HeroStates.StandStill;
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.Idle);
+                    if(!keyState.IsKeyDown(Keys.Down))
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.Idle);
+                    else
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
+
+                    checkMidToUpConditions(keyState, oldKeyState);
+                    checkUpToMidConditions(keyState, oldKeyState);
                 }
                 else
                 {
+                    spriteFlipping = true;
+                    setLegsOffsetTrue();
                     heroState = HeroStates.Running;
+                  
                     moveLeft(gameTime);
-                    body.setCurrentActiveSprite((int)BodySpriteIndex.BodyRun);
-                    legs.setCurrentActiveSprite((int)LegSpriteIndex.LegRun);
-                    refreshHitbox();
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.Idle);
+                    legs.setCurrentActiveSprite((int)LegSpriteIndex.Running);
+                     
+
+                    checkMidToUpConditions(keyState, oldKeyState);
+                    checkUpToMidConditions(keyState, oldKeyState);
                 }
             }
+        }
 
-            fallCheck(viewportRect, elapsedTime);
 
-            if (jumping)
-                shiftY(-jumpVec.getShiftY(), elapsedTime);
 
-            if (onGround)
+        private void handleFalling(GameTime gameTime)
+        {
+            frameLimiter += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
+
+            if (frameLimiter >= MILLISECOND_DELAY)
             {
-                jumpCount = maxJumpCount;
+                frameLimiter = 0;
+
+                if (jumpAcceleration <= 0 && (floor.intersects(standingHitbox) || obstacle.intersects(standingHitbox)) )
+                {
+                    falling = false;
+                    airborn = false;
+                    doubleJumping = false;
+                    jumpAcceleration = 0;
+                }
+                else
+                {
+                    if (!falling && jumpAcceleration < 0) // highest point of jump
+                        falling = true;
+                    if (!airborn)
+                        airborn = true;
+                    if (jumpAcceleration < -40)
+                        jumpAcceleration = -40;
+                    else if (jumpAcceleration > -40)
+                        jumpAcceleration -= 3;
+
+                    int absJumpAccel = Math.Abs(jumpAcceleration);
+
+                    for (int counter = 0; counter < absJumpAccel; counter++)
+                    {
+                        if (jumpAcceleration <= 0 && ((floor.intersects(standingHitbox)) || obstacle.intersects(standingHitbox)) )
+                            break;
+                        if (jumpAcceleration > 0)
+                        {
+                            body.position.Y--;
+                            legs.position.Y--;
+                            legsTransitions.position.Y--;
+                            bodyTransitions.position.Y--;
+                            updateHitboxes();
+                        }
+                        else
+                        {
+                            body.position.Y++;
+                            legs.position.Y++;
+                            legsTransitions.position.Y++;
+                            bodyTransitions.position.Y++;
+                            updateHitboxes();
+                        }
+                    }
+
+                }
             }
         }
 
-        private void fallCheck(Rectangle viewportRect, double elapsedTime)
+        private void setLegsOffsetFalse()
         {
-            if (hitbox.Bottom >= viewportRect.Bottom)
+            if (offsetCheck)
             {
-                body.position[body.getCurrentActiveSprite()].Y -= hitbox.Bottom - viewportRect.Bottom;
-                legs.position[body.getCurrentActiveSprite()].Y -= hitbox.Bottom - viewportRect.Bottom;
-                refreshHitbox();
-                onGround = true;
+                legs.subtXOffset(2);
+                body.subtXOffset(-55);
+                legsTransitions.subtXOffset(2);
+                bodyTransitions.subtXOffset(-55);
+                offsetCheck = false;
             }
-            else
-                onGround = false;
-            //Gravity if it has a horizontal component will not be stopped by jumping
-            //shiftX(PhysicsManager.getGravity().getShiftX(), elapsedTime);
-            if (!jumping && !onGround)
-                shiftY(PhysicsManager.getGravity().getShiftY(), elapsedTime);
+        }
+        private void setLegsOffsetTrue()
+        {
+            if (!offsetCheck)
+            {
+                legs.addXOffset(2);
+                body.addXOffset(-55);
+                legsTransitions.addXOffset(2);
+                bodyTransitions.addXOffset(-55);
+                offsetCheck = true;
+            }
         }
 
-        private void attack()
+        private void setCheckStrings(string newString)
         {
+            if (!bodyString.Equals(newString))
+            {
+                bodyString = newString;
+                body.resetAnimationValues();
+            }
+            if (!legString.Equals(newString))
+            {
+                legString = newString;
+                legs.resetAnimationValues();
+            }
         }
-
-        private void shiftX(float amount, double elapsedTime)
+        private void setTransitionCheckStrings(string newString)
         {
-            rect.X += (int)(amount * elapsedTime);
-            origin = new Vector2(rect.Center.X, rect.Center.Y);
+            if (!bodyString.Equals(newString))
+            {
+                bodyString = newString;
+                bodyTransitions.resetAnimationValues();
+            }
+            if (!legString.Equals(newString))
+            {
+                legString = newString;
+                legsTransitions.resetAnimationValues();
+            }
         }
 
         private void shiftY(float amount, double elapsedTime)
@@ -210,175 +477,392 @@ namespace PLSE_Project.Interfaces
             //rect.Y += (int)(amount * elapsedTime);
             //origin = new Vector2(rect.Center.X, rect.Center.Y);
 
-            body.position[body.getCurrentActiveSprite()].Y += (int)(amount * elapsedTime);
-            legs.position[body.getCurrentActiveSprite()].Y += (int)(amount * elapsedTime);
-            refreshHitbox();
+            body.position.Y += (int)(amount * elapsedTime);
+            legs.position.Y += (int)(amount * elapsedTime);
+             
         }
-
-
         private void jump()
         {
-            if (jumpCount > 0 && !jumping)
-            {
-                jumpCount--;
-                jumpVec = new AccelVec(0, jumpSpeed, jumpTime);
-                jumping = true;
-                Console.WriteLine("JumpCount: " + jumpCount);
-            }
+            jumpAcceleration = 32;
         }
 
-        private void crouch()
-        {
-        
-        }
         public bool intersects(Rectangle rectangle)
         {
-            return rect.Intersects(rectangle);
+            if (isStandingHitbox)
+                return standingHitbox.Intersects(rectangle);
+            else
+                return crouchingHitbox.Intersects(rectangle);
         }
-
         public bool intersects(Colideable obj)
         {
-            return rect.Intersects(obj.getRect());
+            if (isStandingHitbox)
+                return standingHitbox.Intersects(obj.getRect());
+            else
+                return crouchingHitbox.Intersects(obj.getRect());
         }
-
         public Rectangle getRect()
         {
-            return rect;
+            if (isStandingHitbox)
+                return standingHitbox;
+            else
+                return crouchingHitbox;
         }
-        private void moveRight(GameTime gameTime) // Danton //
+        
+        private void moveRight(GameTime gameTime) 
         {
             if (!crouching)
             {
-                body.moveAllLateral(movespeed);
-                legs.moveAllLateral(movespeed);
+                if (!obstacle.intersects(standingHitbox))
+                {
+                    body.move(movespeed);
+                    legs.move(movespeed);
+                    bodyTransitions.move(movespeed);
+                    legsTransitions.move(movespeed);
+                }
+                else { }
             }
             else
             {
-                body.moveAllLateral(movespeed/2);
-                legs.moveAllLateral(movespeed/2);
+                if (!obstacle.intersects(standingHitbox))
+                {
+                    body.move(movespeed / 2);
+                    legs.move(movespeed / 2);
+                    bodyTransitions.move(movespeed / 2);
+                    legsTransitions.move(movespeed / 2);
+                }
+                else { }
             }
+            facingRight = true;
         }
-        private void moveLeft(GameTime gameTime) // Danton //
+        private void moveLeft(GameTime gameTime) 
         {
             if (!crouching)
             {
-                body.moveAllLateral(-movespeed);
-                legs.moveAllLateral(-movespeed);
+                if (!obstacle.intersects(standingHitbox))
+                {
+                    body.move(-movespeed);
+                    legs.move(-movespeed);
+                    bodyTransitions.move(-movespeed);
+                    legsTransitions.move(-movespeed);
+                }
+                else { }
             }
             else
             {
-                body.moveAllLateral(-movespeed / 2);
-                legs.moveAllLateral(-movespeed / 2);
+                if (!obstacle.intersects(standingHitbox))
+                {
+                    body.move(-movespeed / 2);
+                    legs.move(-movespeed / 2);
+                    bodyTransitions.move(-movespeed / 2);
+                    legsTransitions.move(-movespeed / 2);
+                }
+                else { }
+            }
+            facingRight = false;
+        }
+
+        public void updateHitboxes()
+        {
+            if (!crouching && facingRight)
+            {
+                standingHitbox.X = (int)body.position.X - 70;
+                standingHitbox.Y = (int)body.position.Y - 43;
+            }
+            else if (crouching && facingRight)
+            {
+                standingHitbox.X = (int)body.position.X - 70;
+                standingHitbox.Y = (int)body.position.Y - 43;
+            }
+            else if (!crouching && !facingRight)
+            {
+                standingHitbox.X = (int)body.position.X - 25;
+                standingHitbox.Y = (int)body.position.Y - 43;
+            }
+            else if (crouching && !facingRight)
+            {
+                standingHitbox.X = (int)body.position.X - 25;
+                standingHitbox.Y = (int)body.position.Y - 43;
             }
         }
 
-
-        public Rectangle calcNewHitbox(Rectangle bodyBoundingRect, Rectangle legsBoundingRect, Vector2 position) // hitbox refresh logic //
+        static public void setBodyNull()
         {
-            int newWidth = bodyBoundingRect.Width > legsBoundingRect.Width ? bodyBoundingRect.Width : legsBoundingRect.Width;
-            int newHeight = bodyBoundingRect.Height > legsBoundingRect.Height ? bodyBoundingRect.Height : legsBoundingRect.Height;
-
-            return new Rectangle((int)position.X, (int)position.Y, newWidth, newHeight);
+            currentBodyTransition = BodyTransitionIndex.NULL;
         }
-        private void refreshHitbox()
+        static public void setLegNull()
         {
-            hitbox = calcNewHitbox(body.sourceRect[body.getCurrentActiveSprite()], legs.sourceRect[legs.getCurrentActiveSprite()], body.position[body.getCurrentActiveSprite()]);
+            currentLegTransition = LegTransitionIndex.NULL;
         }
 
-        private void setBodyHardCodedVals() // Danton //
+        private void drawCrouchingTransition(KeyboardState keyState, KeyboardState oldKeySate)
         {
-            amountOfSheets = 5;
+                // this is the condition for a transition to be played. //
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
 
-            imgPaths[(int)BodySpriteIndex.BodyCrouch] = "Sprites//Hero//ADV RIFLE//adv_rifle_crouch";
-            imgPaths[(int)BodySpriteIndex.BodyUncrouch] = "Sprites//Hero//ADV RIFLE//adv_rifle_uncrouch";
-            imgPaths[(int)BodySpriteIndex.BodyStillCrouch] = "Sprites//Hero//ADV RIFLE//adv_rifle_crouchidle";
-            imgPaths[(int)BodySpriteIndex.BodyRun] = "Sprites//Hero//ADV RIFLE//adv_rifle_walking";
-            imgPaths[(int)BodySpriteIndex.BodyStill] = "Sprites//Hero//ADV RIFLE//adv_rifle_idle";
+                
+                currentLegTransition = LegTransitionIndex.Crouch;
+                legsTransitions.setCurrentActiveSprite((int)LegTransitionIndex.Crouch);
+               
+                if (!keyState.IsKeyDown(Keys.Up))
+                {
+                    currentBodyTransition = BodyTransitionIndex.Crouch;
+                    bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.Crouch);
+                }
+                setTransitionCheckStrings("crouchtransition");
+        }
+        private void drawUnCrouchingTransition(KeyboardState keyState, KeyboardState oldKeySate)
+        {
+            legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+            bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+            currentLegTransition = LegTransitionIndex.UnCrouch;
+            legsTransitions.setCurrentActiveSprite((int)LegTransitionIndex.UnCrouch);
             
-            frameAmounts[(int)BodySpriteIndex.BodyCrouch] = 4; // these are not implemented yet [NOTE] ALL BODY CROUCH/UNCROUCH LEG CROUCH/UNCROUCH ARE NOT IMPLEMENTED YET THEY ARE FILLED WITH DUMMY VALS //
-            frameAmounts[(int)BodySpriteIndex.BodyUncrouch] = 4; // these are not implemented yet
-            frameAmounts[(int)BodySpriteIndex.BodyStillCrouch] = 25;
-            frameAmounts[(int)BodySpriteIndex.BodyRun] = 23;
-            frameAmounts[(int)BodySpriteIndex.BodyStill] = 25;
+            if (!keyState.IsKeyDown(Keys.Up))
+            {
+                currentBodyTransition = BodyTransitionIndex.UnCrouch;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.UnCrouch);
+            }
+            setTransitionCheckStrings("uncrouchtransition");
+        }
+        
+        private void drawMidToUpTransition(KeyboardState keyState, KeyboardState oldKeyState)
+        {
+            bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+            legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
 
-           /* frameRects[(int)BodySpriteIndex.BodyCrouch] = new Rectangle(0, 0, 118, 166);
-            frameRects[(int)BodySpriteIndex.BodyUncrouch] = new Rectangle(0, 0, 118, 166);
-            frameRects[(int)BodySpriteIndex.BodyStillCrouch] = new Rectangle(0, 0, 118, 166);
-            frameRects[(int)BodySpriteIndex.BodyRun] = new Rectangle(0, 0, 109, 191);
-            frameRects[(int)BodySpriteIndex.BodyStill] = new Rectangle(0, 0, 109, 192);
-            * */
+            currentBodyTransition = BodyTransitionIndex.MidToUp;
+            bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.MidToUp);
+            setTransitionCheckStrings("midtouptransition");
+
+        }
+        private void checkMidToUpConditions(KeyboardState keyState, KeyboardState oldKeyState)
+        {
+            if (keyState.IsKeyDown(Keys.Up))
+            {
+                if (!oldKeyState.IsKeyDown(Keys.Up))
+                {
+                    drawMidToUpTransition(keyState, oldKeyState);
+                }
+                else
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.IdleUp);
+            }
+        }
+
+        private void drawUpToMidTransition(KeyboardState keyState, KeyboardState oldKeyState)
+        {
+            bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+            legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+
+            currentBodyTransition = BodyTransitionIndex.UpToMid;
+            bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.UpToMid);
+            setTransitionCheckStrings("uptomidtransition");
+        }
+        private void checkUpToMidConditions(KeyboardState keyState, KeyboardState oldKeyState)
+        {
+            if (keyState.IsKeyUp(Keys.Up))
+            {
+                if (!oldKeyState.IsKeyUp(Keys.Up))
+                {
+                    drawUpToMidTransition(keyState, oldKeyState);
+                }
+            }
+        }
+        
+
+        private void setBodyHardCodedVals() 
+        {
+            amountOfSheets = 19;
+
+            imgPaths[(int)BodySpriteIndex.CrouchIdle] = "Sprites//Hero//MACHINE GUN//machine_gun_crouchidle";
+            imgPaths[(int)BodySpriteIndex.CrouchMagic] = "Sprites//Hero//MACHINE GUN//machine_gun_crouchmagic";
+            imgPaths[(int)BodySpriteIndex.CrouchReload] = "Sprites//Hero//MACHINE GUN//machine_gun_crouchreload";
+            imgPaths[(int)BodySpriteIndex.CrouchShoot] = "Sprites//Hero//MACHINE GUN//machine_gun_crouchshoot";
+            imgPaths[(int)BodySpriteIndex.Fall] = "Sprites//Hero//MACHINE GUN//machine_gun_fall";
+            imgPaths[(int)BodySpriteIndex.GetHurt] = "Sprites//Hero//MACHINE GUN//machine_gun_gethurt";
+            imgPaths[(int)BodySpriteIndex.HangIdle] = "Sprites//Hero//MACHINE GUN//machine_gun_hangidle";
+            imgPaths[(int)BodySpriteIndex.Idle] = "Sprites//Hero//MACHINE GUN//machine_gun_idle";
+            imgPaths[(int)BodySpriteIndex.IdleUp] = "Sprites//Hero//MACHINE GUN//machine_gun_idleup";
+            imgPaths[(int)BodySpriteIndex.Jump] = "Sprites//Hero//MACHINE GUN//machine_gun_jump";
+            imgPaths[(int)BodySpriteIndex.Magic] = "Sprites//Hero//MACHINE GUN//machine_gun_magic";
+            imgPaths[(int)BodySpriteIndex.MagicDown] = "Sprites//Hero//MACHINE GUN//machine_gun_magicdown";
+            imgPaths[(int)BodySpriteIndex.MagicUp] = "Sprites//Hero//MACHINE GUN//machine_gun_magicup";
+            imgPaths[(int)BodySpriteIndex.PullTowards] = "Sprites//Hero//MACHINE GUN//machine_gun_pulltowards";
+            imgPaths[(int)BodySpriteIndex.PushAway] = "Sprites//Hero//MACHINE GUN//machine_gun_pushaway";
+            imgPaths[(int)BodySpriteIndex.ReloadUp] = "Sprites//Hero//MACHINE GUN//machine_gun_reloadup";
+            imgPaths[(int)BodySpriteIndex.Shoot] = "Sprites//Hero//MACHINE GUN//machine_gun_shoot";
+            imgPaths[(int)BodySpriteIndex.ShootDown] = "Sprites//Hero//MACHINE GUN//machine_gun_shootdown";
+            imgPaths[(int)BodySpriteIndex.ShootUp] = "Sprites//Hero//MACHINE GUN//machine_gun_shootup";
+
+            frameAmounts[(int)BodySpriteIndex.CrouchIdle] = 25;
+            frameAmounts[(int)BodySpriteIndex.CrouchMagic] = 5;
+            frameAmounts[(int)BodySpriteIndex.CrouchReload] = 19;
+            frameAmounts[(int)BodySpriteIndex.CrouchShoot] = 4;
+            frameAmounts[(int)BodySpriteIndex.Fall] = 7;
+            frameAmounts[(int)BodySpriteIndex.GetHurt] = 6;
+            frameAmounts[(int)BodySpriteIndex.HangIdle] = 25;
+            frameAmounts[(int)BodySpriteIndex.Idle] = 25;
+            frameAmounts[(int)BodySpriteIndex.IdleUp] = 25;
+            frameAmounts[(int)BodySpriteIndex.Jump] = 7;
+            frameAmounts[(int)BodySpriteIndex.Magic] = 5;
+            frameAmounts[(int)BodySpriteIndex.MagicDown] = 5;
+            frameAmounts[(int)BodySpriteIndex.MagicUp] = 5;
+            frameAmounts[(int)BodySpriteIndex.PullTowards] = 6;
+            frameAmounts[(int)BodySpriteIndex.PushAway] = 6;
+            frameAmounts[(int)BodySpriteIndex.ReloadUp] = 19;
+            frameAmounts[(int)BodySpriteIndex.Shoot] = 4;
+            frameAmounts[(int)BodySpriteIndex.ShootDown] = 4;
+            frameAmounts[(int)BodySpriteIndex.ShootUp] = 4;
 
             for (int counter = 0; counter < amountOfSheets; counter++)
             {
-                frameRects[counter] = new Rectangle(0,0,141,166);
-                spriteDelayTimes[counter] = 50;
+                frameRects[counter] = new Rectangle(0,0,186,208);
+                spriteDelayTimes[counter] = MILLISECOND_DELAY;
             }
 
-            startingPos[(int)BodySpriteIndex.BodyCrouch] = new Vector2(bodyStartPos.X, bodyStartPos.Y);
-            startingPos[(int)BodySpriteIndex.BodyUncrouch] = new Vector2(bodyStartPos.X, bodyStartPos.Y);
-            startingPos[(int)BodySpriteIndex.BodyStillCrouch] = new Vector2(bodyStartPos.X, bodyStartPos.Y);
-            startingPos[(int)BodySpriteIndex.BodyRun] = new Vector2(bodyStartPos.X, bodyStartPos.Y);
-            startingPos[(int)BodySpriteIndex.BodyStill] = new Vector2(bodyStartPos.X, bodyStartPos.Y);
-
-            /*
-            spriteDelayTimes[(int)BodySpriteIndex.BodyCrouch] = 50;
-            spriteDelayTimes[(int)BodySpriteIndex.BodyUncrouch] = 50;
-            spriteDelayTimes[(int)BodySpriteIndex.BodyStillCrouch] = 50;
-            spriteDelayTimes[(int)BodySpriteIndex.BodyRun] = 50;
-            spriteDelayTimes[(int)BodySpriteIndex.BodyStill] = 50;
-             * */
+            startingPos = new Vector2(bodyStartPos.X, bodyStartPos.Y);
             
         }
-        private void setLegHardCodedVals() // Danton //
+        private void setLegHardCodedVals() 
         {
-            amountOfSheets = 5; // this is for the TOTAL amount of sheets that wil be loaded (this number will obviously increase over time as different animations will be needed) //
+            amountOfSheets = 7; // this is for the TOTAL amount of sheets that wil be loaded (this number will obviously increase over time as different animations will be needed) //
 
-            imgPaths[(int)LegSpriteIndex.LegCrouch] = "Sprites//Hero//LEGS//crouch_";
-            imgPaths[(int)LegSpriteIndex.LegUncrouch] = "Sprites//Hero//LEGS//uncrouch";
-            imgPaths[(int)LegSpriteIndex.LegStillCrouch] = "Sprites//Hero//LEGS//crouchwalk";
-            imgPaths[(int)LegSpriteIndex.LegRun] = "Sprites//Hero//LEGS//running";
-            imgPaths[(int)LegSpriteIndex.LegStill] = "Sprites//Hero//LEGS//idle";
+            imgPaths[(int)LegSpriteIndex.CrouchWalk] = "Sprites//Hero//LEGS//crouchwalk";
+            imgPaths[(int)LegSpriteIndex.Fall] = "Sprites//Hero//LEGS//fall";
+            imgPaths[(int)LegSpriteIndex.GetHurt] = "Sprites//Hero//LEGS//gethurt";
+            imgPaths[(int)LegSpriteIndex.Idle] = "Sprites//Hero//LEGS//idle";
+            imgPaths[(int)LegSpriteIndex.Jump] = "Sprites//Hero//LEGS//jump";
+            imgPaths[(int)LegSpriteIndex.Running] = "Sprites//Hero//LEGS//running";
+            imgPaths[(int)LegSpriteIndex.CrouchIdle] = "Sprites//Hero//LEGS//crouchwalk";
+            
 
-            frameAmounts[(int)LegSpriteIndex.LegCrouch]= 4;
-            frameAmounts[(int)LegSpriteIndex.LegUncrouch] = 4;
-            frameAmounts[(int)LegSpriteIndex.LegStillCrouch] = 1;
-            frameAmounts[(int)LegSpriteIndex.LegRun] = 24;
-            frameAmounts[(int)LegSpriteIndex.LegStill] = 25;
+            frameAmounts[(int)LegSpriteIndex.CrouchWalk] = 14;
+            frameAmounts[(int)LegSpriteIndex.Fall] = 2;
+            frameAmounts[(int)LegSpriteIndex.GetHurt] = 6;
+            frameAmounts[(int)LegSpriteIndex.Idle] = 25;
+            frameAmounts[(int)LegSpriteIndex.Jump] = 9;
+            frameAmounts[(int)LegSpriteIndex.Running] = 15;
+            frameAmounts[(int)LegSpriteIndex.CrouchIdle] = 1;
 
-            /*frameRects[(int)LegSpriteIndex.LegCrouch] = new Rectangle(0, 0, 145, 125); 
-            frameRects[(int)LegSpriteIndex.LegUncrouch] = new Rectangle(0, 0, 145, 125);
-            frameRects[(int)LegSpriteIndex.LegStillCrouch] = new Rectangle(0, 0, 52, 27);
-            frameRects[(int)LegSpriteIndex.LegRun] = new Rectangle(0, 0, 97, 119);
-            frameRects[(int)LegSpriteIndex.LegStill] = new Rectangle(0, 0, 23, 63);
+            for (int counter = 0; counter < amountOfSheets; counter++)
+            {
+                frameRects[counter] = new Rectangle(0, 0, 111, 91);
+                spriteDelayTimes[counter] = MILLISECOND_DELAY;
+            }
+
+            /*startingPos[(int)LegSpriteIndex.CrouchWalk] = new Vector2(legsStartPos.X, legsStartPos.Y);
+            startingPos[(int)LegSpriteIndex.Running] = new Vector2(legsStartPos.X, legsStartPos.Y);
+            startingPos[(int)LegSpriteIndex.Idle] = new Vector2(legsStartPos.X, legsStartPos.Y);
             */
+
+            startingPos = new Vector2(legsStartPos.X, legsStartPos.Y);
+          
+        }
+        private void setSingleSheetHardCodedVals()
+        {
+
+            // this is ALL incorrect, needs to change to the correct single sheets //
+
+            amountOfSheets = 3; // this is for the TOTAL amount of sheets that wil be loaded (this number will obviously increase over time as different animations will be needed) //
+
+            imgPaths[(int)LegSpriteIndex.CrouchWalk] = "Sprites//Hero//LEGS//crouchwalk";
+            imgPaths[(int)LegSpriteIndex.Running] = "Sprites//Hero//LEGS//running";
+            imgPaths[(int)LegSpriteIndex.Idle] = "Sprites//Hero//LEGS//idle";
+
+            frameAmounts[(int)LegSpriteIndex.CrouchWalk] = 1;
+            frameAmounts[(int)LegSpriteIndex.Running] = 24;
+            frameAmounts[(int)LegSpriteIndex.Idle] = 25;
+
             for (int counter = 0; counter < amountOfSheets; counter++)
             {
                 frameRects[counter] = new Rectangle(0, 0, 101, 86);
-                spriteDelayTimes[counter] = 50;
+                spriteDelayTimes[counter] = MILLISECOND_DELAY;
             }
 
-            startingPos[(int)LegSpriteIndex.LegCrouch] = new Vector2(legsStartPos.X,legsStartPos.Y);
-            startingPos[(int)LegSpriteIndex.LegUncrouch] = new Vector2(legsStartPos.X, legsStartPos.Y);
-            startingPos[(int)LegSpriteIndex.LegStillCrouch] = new Vector2(legsStartPos.X, legsStartPos.Y);
-            startingPos[(int)LegSpriteIndex.LegRun] = new Vector2(legsStartPos.X, legsStartPos.Y);
-            startingPos[(int)LegSpriteIndex.LegStill] = new Vector2(legsStartPos.X, legsStartPos.Y);
-
-            /*
-            spriteDelayTimes[(int)LegSpriteIndex.LegCrouch] = 50;
-            spriteDelayTimes[(int)LegSpriteIndex.LegUncrouch] = 50;
-            spriteDelayTimes[(int)LegSpriteIndex.LegStillCrouch] = 50;
-            spriteDelayTimes[(int)LegSpriteIndex.LegRun] = 50;
-            spriteDelayTimes[(int)LegSpriteIndex.LegStill] = 50;
-             */
+            /*startingPos[(int)LegSpriteIndex.CrouchWalk] = new Vector2(legsStartPos.X, legsStartPos.Y);
+            startingPos[(int)LegSpriteIndex.Running] = new Vector2(legsStartPos.X, legsStartPos.Y);
+            startingPos[(int)LegSpriteIndex.Idle] = new Vector2(legsStartPos.X, legsStartPos.Y);
+             * */
+            startingPos = new Vector2(legsStartPos.X, legsStartPos.Y);
         }
+        private void setBodyTransitionHardCodedValues()
+        {
+            amountOfSheets = 15; // this is for the TOTAL amount of sheets that wil be loaded (this number will obviously increase over time as different animations will be needed) //
 
+            imgPaths[(int)BodyTransitionIndex.Crouch] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_crouch";
+            imgPaths[(int)BodyTransitionIndex.CrouchHolster] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_crouchholster"; // new
+            imgPaths[(int)BodyTransitionIndex.CrouchTurn] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_crouchturn"; 
+            //imgPaths[(int)BodyTransitionIndex.CrouchUnHolster] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_crouchunholster";// new
+            imgPaths[(int)BodyTransitionIndex.Hoist] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_hoist";
+            imgPaths[(int)BodyTransitionIndex.Holster] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_holster";
+            imgPaths[(int)BodyTransitionIndex.LowToMid] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_lowtomid";
+            imgPaths[(int)BodyTransitionIndex.MidToLow] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_midtolow";
+            imgPaths[(int)BodyTransitionIndex.MidToUp] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_midtoup";
+            imgPaths[(int)BodyTransitionIndex.Turn] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_turn";
+            imgPaths[(int)BodyTransitionIndex.TurnUp] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_turnup";
+            imgPaths[(int)BodyTransitionIndex.TurnDown] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_turndown"; // new
+            imgPaths[(int)BodyTransitionIndex.UnCrouch] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_uncrouch";
+            //imgPaths[(int)BodyTransitionIndex.UnHolster] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_unholster";
+            imgPaths[(int)BodyTransitionIndex.UpToMid] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_uptomid";
+
+
+            frameAmounts[(int)BodyTransitionIndex.Crouch] = 6;
+            frameAmounts[(int)BodyTransitionIndex.CrouchTurn] = 4;
+            frameAmounts[(int)BodyTransitionIndex.CrouchHolster] = 8; 
+            frameAmounts[(int)BodyTransitionIndex.TurnDown] = 4; 
+            frameAmounts[(int)BodyTransitionIndex.Hoist] = 14;
+            frameAmounts[(int)BodyTransitionIndex.Holster] = 8;
+            frameAmounts[(int)BodyTransitionIndex.LowToMid] = 4;
+            frameAmounts[(int)BodyTransitionIndex.MidToLow] = 4;
+            frameAmounts[(int)BodyTransitionIndex.MidToUp]  = 4;
+            frameAmounts[(int)BodyTransitionIndex.Turn] = 4;
+            frameAmounts[(int)BodyTransitionIndex.TurnUp] = 4;
+            //frameAmounts[(int)BodyTransitionIndex.CrouchUnHolster] = 4; 
+            frameAmounts[(int)BodyTransitionIndex.UnCrouch] = 6;
+            //frameAmounts[(int)BodyTransitionIndex.UnHolster] = 4;
+            frameAmounts[(int)BodyTransitionIndex.UpToMid] = 4;
+
+            for (int counter = 0; counter < amountOfSheets; counter++)
+            {
+                frameRects[counter] = new Rectangle(0, 0, 186, 208);
+                spriteDelayTimes[counter] = MILLISECOND_DELAY;
+               // startingPos[counter] = new Vector2(bodyStartPos.X, bodyStartPos.Y);
+            }
+            startingPos = new Vector2(bodyStartPos.X, bodyStartPos.Y);
+        }
+        private void setLegsTransitionHardCodedValues()
+        {
+            amountOfSheets = 7; // total number of sheets to be loaded //
+
+            imgPaths[(int)LegTransitionIndex.Crouch] = "Sprites//Hero//LEGS//Transitions//crouch";
+            imgPaths[(int)LegTransitionIndex.UnCrouch] = "Sprites//Hero//LEGS//Transitions//uncrouch";
+
+            frameAmounts[(int)LegTransitionIndex.Crouch]  = 5;
+            frameAmounts[(int)LegTransitionIndex.UnCrouch] = 7;
+            
+            
+            for (int counter = 0; counter < amountOfSheets; counter++)
+            {
+                frameRects[counter] = new Rectangle(0, 0, 111, 91);
+                spriteDelayTimes[counter] = MILLISECOND_DELAY;
+                //startingPos[counter] = new Vector2(legsStartPos.X, legsStartPos.Y);
+            }
+            startingPos = new Vector2(legsStartPos.X, legsStartPos.Y);
+        }
         private void initalizeStagingArrays()
         {
-            frameAmounts = new int[5]; 
-            frameRects = new Rectangle[5];
-            imgPaths = new string[5];
-            startingPos = new Vector2[5];
-            spriteDelayTimes = new int[5];
+            frameAmounts = new int[25]; 
+            frameRects = new Rectangle[25];
+            imgPaths = new string[25];
+            //startingPos = new Vector2[20];
+            spriteDelayTimes = new int[25];
         }
+
+        public void passPlatform(Platform plat, Platform obs)
+        {
+            floor = plat;
+            obstacle = obs;
+        } // for debugging collision & jumping //
     }
 }

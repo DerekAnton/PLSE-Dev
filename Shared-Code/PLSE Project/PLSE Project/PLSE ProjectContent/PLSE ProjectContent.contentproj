@@ -42,23 +42,34 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Sprites\Hero\MACHINE GUN\" />
     <Folder Include="Sprites\Hero\RIFLE\" />
     <Folder Include="Sprites\Hero\ROCKET\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_crouch.png">
-      <Name>adv_rifle_crouch</Name>
+    <Compile Include="Sprites\Hero\GOOMBA\die.png">
+      <Name>die</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_crouchendreload.png">
-      <Name>adv_rifle_crouchendreload</Name>
+    <Compile Include="Sprites\Hero\GOOMBA\turn.png">
+      <Name>turn</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_crouchholster.png">
+    <Compile Include="Sprites\Hero\GOOMBA\walk.png">
+      <Name>walk</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_crouchholster.png">
       <Name>adv_rifle_crouchholster</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_crouchidle.png">
+      <Name>adv_rifle_crouchidle</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -72,38 +83,13 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_crouchstartreload.png">
-      <Name>adv_rifle_crouchstartreload</Name>
+    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_crouchreload.png">
+      <Name>adv_rifle_crouchreload</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_crouchturn.png">
-      <Name>adv_rifle_crouchturn</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_crouchunholster.png">
+    <Compile Include="Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_crouchunholster.png">
       <Name>adv_rifle_crouchunholster</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_drop.png">
-      <Name>adv_rifle_drop</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_endreload.png">
-      <Name>adv_rifle_endreload</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_endwalk.png">
-      <Name>adv_rifle_endwalk</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_endwalkup.png">
-      <Name>adv_rifle_endwalkup</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -122,18 +108,8 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_hoist.png">
-      <Name>adv_rifle_hoist</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_holster.png">
-      <Name>adv_rifle_holster</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_hurtlanding.png">
-      <Name>adv_rifle_hurtlanding</Name>
+    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_rally.png">
+      <Name>adv_rifle_rally</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -157,16 +133,6 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_landing.png">
-      <Name>adv_rifle_landing</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_lowtomid.png">
-      <Name>adv_rifle_lowtomid</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
     <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_magic.png">
       <Name>adv_rifle_magic</Name>
       <Importer>TextureImporter</Importer>
@@ -179,16 +145,6 @@
     </Compile>
     <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_magicup.png">
       <Name>adv_rifle_magicup</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_midtolow.png">
-      <Name>adv_rifle_midtolow</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_midtoup.png">
-      <Name>adv_rifle_midtoup</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -217,70 +173,87 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_startreload.png">
-      <Name>adv_rifle_startreload</Name>
+    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_reload.png">
+      <Name>adv_rifle_reload</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_turn.png">
-      <Name>adv_rifle_turn</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_turndown.png">
+    <Compile Include="Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_turndown.png">
       <Name>adv_rifle_turndown</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_turnup.png">
-      <Name>adv_rifle_turnup</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_twistjump_.png">
-      <Name>adv_rifle_twistjump_</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_uncrouch.png">
-      <Name>adv_rifle_uncrouch</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_unholster.png">
-      <Name>adv_rifle_unholster</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_uptomid.png">
-      <Name>adv_rifle_uptomid</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_walking.png">
-      <Name>adv_rifle_walking</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_walkingup.png">
-      <Name>adv_rifle_walkingup</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Sprites\Hero\GOOMBA\die.png">
-      <Name>die</Name>
+    <Compile Include="Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_crouch.png">
+      <Name>adv_rifle_crouch</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Hero\GOOMBA\turn.png">
-      <Name>turn</Name>
+    <Compile Include="Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_crouchturn.png">
+      <Name>adv_rifle_crouchturn</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Hero\GOOMBA\walk.png">
-      <Name>walk</Name>
+    <Compile Include="Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_hoist.png">
+      <Name>adv_rifle_hoist</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_holster.png">
+      <Name>adv_rifle_holster</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_lowtomid.png">
+      <Name>adv_rifle_lowtomid</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_midtolow.png">
+      <Name>adv_rifle_midtolow</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_midtoup.png">
+      <Name>adv_rifle_midtoup</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_turn.png">
+      <Name>adv_rifle_turn</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_turnup.png">
+      <Name>adv_rifle_turnup</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_uncrouch.png">
+      <Name>adv_rifle_uncrouch</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_unholster.png">
+      <Name>adv_rifle_unholster</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_uptomid.png">
+      <Name>adv_rifle_uptomid</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\Hero\LEGS\Transitions\crouch.png">
+      <Name>crouch</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\LEGS\Transitions\uncrouch.png">
+      <Name>uncrouch</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -291,38 +264,13 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Hero\LEGS\crouch_.png">
-      <Name>crouch_</Name>
+    <Compile Include="Sprites\Hero\LEGS\fall.png">
+      <Name>fall</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Hero\LEGS\dbljumpfall_.png">
-      <Name>dbljumpfall_</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\LEGS\dbljump_.png">
-      <Name>dbljump_</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\LEGS\endrun.png">
-      <Name>endrun</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\LEGS\fallturn_.png">
-      <Name>fallturn_</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\LEGS\fall_.png">
-      <Name>fall_</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\LEGS\gethurt_.png">
-      <Name>gethurt_</Name>
+    <Compile Include="Sprites\Hero\LEGS\gethurt.png">
+      <Name>gethurt</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -331,18 +279,8 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Hero\LEGS\jumpturn_.png">
-      <Name>jumpturn_</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\LEGS\jump_.png">
-      <Name>jump_</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\LEGS\land.png">
-      <Name>land</Name>
+    <Compile Include="Sprites\Hero\LEGS\jump.png">
+      <Name>jump</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -351,25 +289,191 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Hero\LEGS\startrun.png">
-      <Name>startrun</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\LEGS\turn.png">
-      <Name>turn</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Hero\LEGS\uncrouch.png">
-      <Name>uncrouch</Name>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\platform.png">
+      <Name>platform</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_crouchidle.png">
-      <Name>adv_rifle_crouchidle</Name>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_crouchidle.png">
+      <Name>machine_gun_crouchidle</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_crouchmagic.png">
+      <Name>machine_gun_crouchmagic</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_crouchreload.png">
+      <Name>machine_gun_crouchreload</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_crouchshoot.png">
+      <Name>machine_gun_crouchshoot</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_fall.png">
+      <Name>machine_gun_fall</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_gethurt.png">
+      <Name>machine_gun_gethurt</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_hangidle.png">
+      <Name>machine_gun_hangidle</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_idle.png">
+      <Name>machine_gun_idle</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_idleup.png">
+      <Name>machine_gun_idleup</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_jump.png">
+      <Name>machine_gun_jump</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_magic.png">
+      <Name>machine_gun_magic</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_magicdown.png">
+      <Name>machine_gun_magicdown</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_magicup.png">
+      <Name>machine_gun_magicup</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_pulltowards.png">
+      <Name>machine_gun_pulltowards</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_pushaway.png">
+      <Name>machine_gun_pushaway</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_reloadup.png">
+      <Name>machine_gun_reloadup</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_shoot.png">
+      <Name>machine_gun_shoot</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_shootdown.png">
+      <Name>machine_gun_shootdown</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\machine_gun_shootup.png">
+      <Name>machine_gun_shootup</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\Hero\MACHINE GUN\Transitions\machine_gun_crouch.png">
+      <Name>machine_gun_crouch</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\Transitions\machine_gun_crouchholster.png">
+      <Name>machine_gun_crouchholster</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\Transitions\machine_gun_crouchturn.png">
+      <Name>machine_gun_crouchturn</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\Transitions\machine_gun_grabledge.png">
+      <Name>machine_gun_grabledge</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\Transitions\machine_gun_hoist.png">
+      <Name>machine_gun_hoist</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\Transitions\machine_gun_holster.png">
+      <Name>machine_gun_holster</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\Transitions\machine_gun_letgo.png">
+      <Name>machine_gun_letgo</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\Transitions\machine_gun_lowtomid.png">
+      <Name>machine_gun_lowtomid</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\Transitions\machine_gun_midtolow.png">
+      <Name>machine_gun_midtolow</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\Transitions\machine_gun_midtoup.png">
+      <Name>machine_gun_midtoup</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\Transitions\machine_gun_turn.png">
+      <Name>machine_gun_turn</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\Transitions\machine_gun_turndown.png">
+      <Name>machine_gun_turndown</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\Transitions\machine_gun_turnup.png">
+      <Name>machine_gun_turnup</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\Transitions\machine_gun_uncrouch.png">
+      <Name>machine_gun_uncrouch</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Hero\MACHINE GUN\Transitions\machine_gun_uptomid.png">
+      <Name>machine_gun_uptomid</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\obstacle.png">
+      <Name>obstacle</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
