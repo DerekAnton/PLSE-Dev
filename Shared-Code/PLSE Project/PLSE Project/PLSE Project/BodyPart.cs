@@ -25,8 +25,8 @@ namespace PLSE_Project.Interfaces
         public int[] sheetWidths;
         public int[] sheetHeights;
         public int[] animationCounter;
-        public int amountOfSheets; // amount of sheets in the array of texture 2Ds //
         public int[] lengthOfTimePerFrame;
+        public int amountOfSheets; // amount of sheets in the array of texture 2Ds //
         public int frameLimiter;
 
         public bool printme = false;
@@ -65,7 +65,7 @@ namespace PLSE_Project.Interfaces
         }
 
 
-        public void setPosition(int desiredSprite, int newX, int newY) // very small move, will need a massive move to move all the images in tandem //
+        public void setPosition(int desiredSprite, int newX, int newY) 
         {
             position.X = newX;
             position.Y = newY;
@@ -94,6 +94,22 @@ namespace PLSE_Project.Interfaces
 
                 if (animationCounter[currentActiveSprite] >= frameAmounts[currentActiveSprite])
                     animationCounter[currentActiveSprite] = 0;
+            }
+        }
+        public void animateLastFrameHeld(GameTime gameTime)
+        {
+            frameLimiter += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
+
+            if (frameLimiter >= lengthOfTimePerFrame[currentActiveSprite])
+            {
+                frameLimiter = 0;
+
+                sourceRect[currentActiveSprite].X = (animationCounter[currentActiveSprite] % 10) * sourceRect[currentActiveSprite].Width;
+                sourceRect[currentActiveSprite].Y = (animationCounter[currentActiveSprite] / 10) * sourceRect[currentActiveSprite].Height;
+                animationCounter[currentActiveSprite]++;
+
+                if (animationCounter[currentActiveSprite] >= frameAmounts[currentActiveSprite])
+                    animationCounter[currentActiveSprite] = frameAmounts[currentActiveSprite];
             }
         }
 
@@ -142,3 +158,12 @@ namespace PLSE_Project.Interfaces
         }
     }
 }
+
+/*
+Frame limiting logic (can be used elsewhere)
+ frameLimiter += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
+
+            if (frameLimiter >= lengthOfTimePerFrame[currentActiveSprite])
+            {
+                frameLimiter = 0;
+*/

@@ -81,3 +81,5 @@ Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_turnup.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_uncrouch.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_uptomid.xnb
 Content\Sprites\obstacle.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_crouching.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_reload.xnb

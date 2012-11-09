@@ -20,7 +20,6 @@ namespace PLSE_Project.Interfaces
     public enum BodyTransitionIndex { Crouch, CrouchHolster, CrouchTurn, /*CrouchUnHolster,*/ Hoist, Holster, LowToMid, MidToLow, MidToUp, Turn, TurnDown, TurnUp, UnCrouch, /*UnHolster,*/ UpToMid, NULL };
     public enum LegTransitionIndex { Crouch, EndRun, FallTurn, JumpTurn, StartRun, Turn, UnCrouch, NULL };
 
-    public enum SingleSheetIndex { /*TBA*/ };
     public enum HeroStates { StandStill, CrouchStill, CrouchWalking, Running, Jumping};
 
     class Hero : Colideable
@@ -28,30 +27,35 @@ namespace PLSE_Project.Interfaces
 
         private readonly int MILLISECOND_DELAY = 30; // used for frame limiting 
 
-        private Platform floor; // for debugging jumping & collision only //
-        private Platform obstacle; 
-
-        // staging arrays for the start of a new BodyPart Object //
-        private int amountOfSheets;
+        private Platform floor; // for debugging jumping & collision only (test harness before i recieve Jordan's level loading)//
+        private Platform obstacle;
+        // STAGING ARRAYS //
+        private Vector2 startingPos; 
+        private int[] spriteDelayTimes; // staging arrays that are filled with essential information for sprite loading thbat is delegated to each body part / transitional body part object //
         private int[] frameAmounts; 
-        private Rectangle[] frameRects;
+        private Rectangle[] frameRects; 
         private string[] imgPaths;
-        private Vector2 startingPos;
-        private int[] spriteDelayTimes;
-        private int movespeed = 5;
-        
-        public Rectangle standingHitbox = new Rectangle(50,50,70,145);
-        public Rectangle crouchingHitbox;
 
+        private const float speed = 3.0f;
+        private Vector2 legsStartPos = new Vector2(115, 270);
+        private Vector2 bodyStartPos = new Vector2(165, 190);
+        private int movespeed = 5;
+        private int amountOfSheets; 
         private string bodyString = ""; 
         private string legString = "";
+        // JUMPING VARIABLES //
+        private bool airborn = false;
+        private bool doubleJumping = false;
+        private bool falling = false;
+        private int jumpAcceleration = 0;
+        private int horizontalJumpInertia = 0;
+        private int frameLimiter = 0;
+        private int jumpsLeft = 2;
 
         public int legOffset = 0;
         public int bodyOffset = 0;
-
-        // hard coded values for the starting position of the leg sprites and the body sprites //
-        private Vector2 legsStartPos = new Vector2(115,270);
-        private Vector2 bodyStartPos = new Vector2(165,190);
+        public Rectangle standingHitbox = new Rectangle(50, 50, 70, 145);
+        public Rectangle crouchingHitbox;
 
         public BodyPart body; 
         public BodyPart legs;
@@ -68,27 +72,11 @@ namespace PLSE_Project.Interfaces
         bool spriteFlipping = false; 
         bool crouching = false;
 
-        private const int maxJumpCount = 1;
-        private int jumpCount = maxJumpCount;
-        private const double jumpTime = 90;
-        private const float jumpSpeed = 1.5f;
-        //private bool jumping = false;
-        private AccelVec jumpVec;
-
-        // JUMPING VARIABLES //
-        private bool airborn = false;
-        private bool doubleJumping = false;
-        private bool falling = false;
-        private int jumpAcceleration = 0;
-        private int horizontalJumpInertia = 0;
-        private int frameLimiter = 0;
-
         private bool onGround = true;
-        private bool isStandingHitbox = true; // only two types of hit boxes, standing and crouching, (crouching == !standing)
+        private bool isStandingHitbox = true; // only two types of hit boxes, standing and crouching, (crouching == !standing) //
         private bool offsetCheck = false;
         private bool facingRight = true;
-
-        private const float speed = 3.0f;
+        bool facingUp = false;
 
         public Hero() { }
 
@@ -152,12 +140,13 @@ namespace PLSE_Project.Interfaces
 
                 if (!(currentBodyTransition == BodyTransitionIndex.NULL))
                 {
-                    bodyTransitions.draw(spriteBatch, spriteFlipping);
-
                     if (!(currentLegTransition == LegTransitionIndex.NULL))
                         legsTransitions.draw(spriteBatch, spriteFlipping);
                     else
                         legs.draw(spriteBatch, spriteFlipping);
+
+                    bodyTransitions.draw(spriteBatch, spriteFlipping);
+
                 }
                 else if (!(currentLegTransition == LegTransitionIndex.NULL))
                 {
@@ -179,12 +168,12 @@ namespace PLSE_Project.Interfaces
 
                 if (!(currentBodyTransition == BodyTransitionIndex.NULL))
                 {
-                    bodyTransitions.draw(spriteBatch, spriteFlipping);
-
                     if (!(currentLegTransition == LegTransitionIndex.NULL))
                         legsTransitions.draw(spriteBatch, spriteFlipping);
                     else
                         legs.draw(spriteBatch, spriteFlipping);
+
+                    bodyTransitions.draw(spriteBatch, spriteFlipping);
                 }
                 else if (!(currentLegTransition == LegTransitionIndex.NULL))
                 {
@@ -205,14 +194,18 @@ namespace PLSE_Project.Interfaces
 
         private void move(KeyboardState keyState, KeyboardState oldKeyState, Rectangle viewportRect, double elapsedTime, GameTime gameTime)
         {
-            //bodyTransitions.setPrintMe(true);
-            legsTransitions.setPrintMe(true);
-            body.setPrintMe(true);
 
-
-            if (keyState.IsKeyDown(Keys.Space))
+            if (keyState.IsKeyDown(Keys.Space) && !oldKeyState.IsKeyDown(Keys.Space) && !crouching)
             {
-                jump();
+                if (jumpsLeft <= 2 && jumpsLeft > 0)
+                {
+                    heroState = HeroStates.Jumping;
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.Jump);
+                    legs.setCurrentActiveSprite((int)LegSpriteIndex.Jump);
+                    setCheckStrings("jumping");
+                    jump();
+
+                }
             }
 
             if (heroState == HeroStates.StandStill && !oldKeyState.IsKeyDown(Keys.Down) && keyState.IsKeyDown(Keys.Down)) // case for idle -> crouch transition
@@ -227,30 +220,31 @@ namespace PLSE_Project.Interfaces
                 body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
                 legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
                  
-                 
                 setCheckStrings("crouchidle");
-
-                //checkMidToUpConditions(keyState, oldKeyState);
-                //checkUpToMidConditions(keyState, oldKeyState);
             }
             
             if (keyState.IsKeyDown(Keys.Down) && (keyState.IsKeyDown(Keys.Right) || keyState.IsKeyDown(Keys.Left)) && onGround) // case for moving into crouch  //
             {
                 if (keyState.IsKeyDown(Keys.Left))
                 {
+                    checkFacingRight(keyState, oldKeyState);
                     spriteFlipping = true;
                     setLegsOffsetTrue();
                 }
                 else
                 {
+                    checkFacingLeft(keyState, oldKeyState);
                     spriteFlipping = false;
                     setLegsOffsetFalse();
                 }
 
                 if (!oldKeyState.IsKeyDown(Keys.Down) && keyState.IsKeyDown(Keys.Down))
                 {
-                    drawCrouchingTransition(keyState, oldKeyState);
-                     
+                    drawCrouchingTransition(keyState, oldKeyState);    
+                }
+                else if( keyState.IsKeyDown(Keys.Down) && oldKeyState.IsKeyDown(Keys.Up) && !keyState.IsKeyDown(Keys.Up))
+                {
+                    drawCrouchingTransition(keyState, oldKeyState); // CASE FOR LOOKING UP, THEN PRESS CROUCH, THEN LET GO OF LOOKING UP // 
                 }
                 else
                 {
@@ -258,8 +252,6 @@ namespace PLSE_Project.Interfaces
                     heroState = HeroStates.CrouchWalking;
                     body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
                     legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
-                    //checkMidToUpConditions(keyState, oldKeyState);
-                    //checkUpToMidConditions(keyState, oldKeyState);
                 }
             }
 
@@ -279,6 +271,7 @@ namespace PLSE_Project.Interfaces
                 if (keyState.IsKeyDown(Keys.Down))
                 {
                     spriteFlipping = false;
+                    checkFacingLeft(keyState, oldKeyState);
                     setLegsOffsetFalse();
                     crouching = true;
                     heroState = HeroStates.CrouchWalking;
@@ -289,8 +282,6 @@ namespace PLSE_Project.Interfaces
                         legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchWalk);
                     else
                         legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
-                   // checkMidToUpConditions(keyState, oldKeyState);
-                    //checkUpToMidConditions(keyState, oldKeyState);
                 }
                 else if(keyState.IsKeyDown(Keys.Left))
                 {
@@ -308,6 +299,7 @@ namespace PLSE_Project.Interfaces
                 else
                 {
                     spriteFlipping = false;
+                    checkFacingLeft(keyState, oldKeyState);
                     setLegsOffsetFalse();
                     heroState = HeroStates.Running;
                     moveRight(gameTime);
@@ -322,25 +314,23 @@ namespace PLSE_Project.Interfaces
                 if (keyState.IsKeyDown(Keys.Down))
                 {
                     spriteFlipping = true;
+                    checkFacingRight(keyState, oldKeyState);
                     setLegsOffsetTrue();
                     heroState = HeroStates.CrouchWalking;
                     moveLeft(gameTime);
                     body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
+
                     if(!keyState.IsKeyDown(Keys.Right))
                         legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchWalk);
                     else
                         legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
-
-                    //checkMidToUpConditions(keyState, oldKeyState);
-                    //checkUpToMidConditions(keyState, oldKeyState);
                 }
                 else if (keyState.IsKeyDown(Keys.Right))
                 {
                     crouching = false;
-                     
-                     
                     heroState = HeroStates.StandStill;
                     body.setCurrentActiveSprite((int)BodySpriteIndex.Idle);
+
                     if(!keyState.IsKeyDown(Keys.Down))
                         legs.setCurrentActiveSprite((int)LegSpriteIndex.Idle);
                     else
@@ -352,6 +342,7 @@ namespace PLSE_Project.Interfaces
                 else
                 {
                     spriteFlipping = true;
+                    checkFacingRight(keyState, oldKeyState);
                     setLegsOffsetTrue();
                     heroState = HeroStates.Running;
                   
@@ -364,8 +355,8 @@ namespace PLSE_Project.Interfaces
                     checkUpToMidConditions(keyState, oldKeyState);
                 }
             }
+            
         }
-
 
 
         private void handleFalling(GameTime gameTime)
@@ -382,6 +373,7 @@ namespace PLSE_Project.Interfaces
                     airborn = false;
                     doubleJumping = false;
                     jumpAcceleration = 0;
+                    jumpsLeft = 2;
                 }
                 else
                 {
@@ -472,18 +464,11 @@ namespace PLSE_Project.Interfaces
             }
         }
 
-        private void shiftY(float amount, double elapsedTime)
-        {
-            //rect.Y += (int)(amount * elapsedTime);
-            //origin = new Vector2(rect.Center.X, rect.Center.Y);
-
-            body.position.Y += (int)(amount * elapsedTime);
-            legs.position.Y += (int)(amount * elapsedTime);
-             
-        }
+        
         private void jump()
         {
             jumpAcceleration = 32;
+            jumpsLeft--;
         }
 
         public bool intersects(Rectangle rectangle)
@@ -519,7 +504,13 @@ namespace PLSE_Project.Interfaces
                     bodyTransitions.move(movespeed);
                     legsTransitions.move(movespeed);
                 }
-                else { }
+                else if (obstacle.getRect().Top + 20 > standingHitbox.Bottom)
+                {
+                    body.move(movespeed);
+                    legs.move(movespeed);
+                    bodyTransitions.move(movespeed);
+                    legsTransitions.move(movespeed);
+                }
             }
             else
             {
@@ -530,7 +521,13 @@ namespace PLSE_Project.Interfaces
                     bodyTransitions.move(movespeed / 2);
                     legsTransitions.move(movespeed / 2);
                 }
-                else { }
+                else if (obstacle.getRect().Top + 20 > standingHitbox.Bottom)
+                {
+                    body.move(movespeed);
+                    legs.move(movespeed);
+                    bodyTransitions.move(movespeed);
+                    legsTransitions.move(movespeed);
+                }
             }
             facingRight = true;
         }
@@ -545,7 +542,13 @@ namespace PLSE_Project.Interfaces
                     bodyTransitions.move(-movespeed);
                     legsTransitions.move(-movespeed);
                 }
-                else { }
+                else if(obstacle.getRect().Top + 20 > standingHitbox.Bottom)
+                {
+                    body.move(-movespeed);
+                    legs.move(-movespeed);
+                    bodyTransitions.move(-movespeed);
+                    legsTransitions.move(-movespeed);
+                }
             }
             else
             {
@@ -556,7 +559,13 @@ namespace PLSE_Project.Interfaces
                     bodyTransitions.move(-movespeed / 2);
                     legsTransitions.move(-movespeed / 2);
                 }
-                else { }
+                else if (obstacle.getRect().Top + 20 > standingHitbox.Bottom)
+                {
+                    body.move(-movespeed);
+                    legs.move(-movespeed);
+                    bodyTransitions.move(-movespeed);
+                    legsTransitions.move(-movespeed);
+                }
             }
             facingRight = false;
         }
@@ -641,10 +650,10 @@ namespace PLSE_Project.Interfaces
         {
             if (keyState.IsKeyDown(Keys.Up))
             {
+                facingUp = true;
+
                 if (!oldKeyState.IsKeyDown(Keys.Up))
-                {
                     drawMidToUpTransition(keyState, oldKeyState);
-                }
                 else
                     body.setCurrentActiveSprite((int)BodySpriteIndex.IdleUp);
             }
@@ -666,10 +675,53 @@ namespace PLSE_Project.Interfaces
                 if (!oldKeyState.IsKeyUp(Keys.Up))
                 {
                     drawUpToMidTransition(keyState, oldKeyState);
+                    facingUp = false;
                 }
             }
         }
-        
+
+        private void drawTurningTransition(KeyboardState keyState, KeyboardState oldKeyState)
+        {
+            bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+            legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+
+            if (!crouching && !facingUp)
+            {
+                currentBodyTransition = BodyTransitionIndex.Turn;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.Turn);
+                setTransitionCheckStrings("turntransition");
+
+            }
+            else if(crouching && !facingUp)
+            {
+                currentBodyTransition = BodyTransitionIndex.CrouchTurn;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.CrouchTurn);
+                setTransitionCheckStrings("crouchturntransition");
+            }
+            else if (facingUp && !crouching)
+            {
+                currentBodyTransition = BodyTransitionIndex.TurnUp;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.TurnUp);
+                setTransitionCheckStrings("turnuptransition");
+            }
+
+        }
+        private void checkFacingLeft(KeyboardState keyState, KeyboardState oldKeyState)
+        {
+            if (!facingRight)
+            {
+                facingRight = true;
+                drawTurningTransition(keyState, oldKeyState);
+            }
+        }
+        private void checkFacingRight(KeyboardState keyState, KeyboardState oldKeyState)
+        {
+            if (facingRight)
+            {
+                facingRight = false;
+                drawTurningTransition(keyState, oldKeyState);
+            }
+        }
 
         private void setBodyHardCodedVals() 
         {

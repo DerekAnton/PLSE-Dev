@@ -16,21 +16,14 @@ namespace PLSE_Project.Interfaces
     {
         public TransitionBodyPart(ContentManager content, int amountOfSheets, int[] frameAmount, Rectangle[] sourceRect, string[] imgPath, Vector2 startingPos, int[] frameDelayTimes)
             : base(content, amountOfSheets, frameAmount, sourceRect, imgPath, startingPos, frameDelayTimes)
-        {
-
-        }
+        { }
         public void animateUntilEndFrame(GameTime gameTime)
         {
             frameLimiter += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
 
             if (frameLimiter >= lengthOfTimePerFrame[currentActiveSprite])
             {
-                
                 frameLimiter = 0;
-                if (printme)
-                    Console.WriteLine(animationCounter[currentActiveSprite]);
-
-
                 sourceRect[currentActiveSprite].X = (animationCounter[currentActiveSprite] % 10) * sourceRect[currentActiveSprite].Width;
                 sourceRect[currentActiveSprite].Y = (animationCounter[currentActiveSprite] / 10) * sourceRect[currentActiveSprite].Height;
                 animationCounter[currentActiveSprite]++;
@@ -41,20 +34,6 @@ namespace PLSE_Project.Interfaces
                     Hero.setBodyNull();                       
                     Hero.setLegNull();
                 }
-                
-                /*
-                if ((sourceRect[currentActiveSprite].X + sourceRect[currentActiveSprite].Width) < sheetWidths[currentActiveSprite] && (sourceRect[currentActiveSprite].Y + sourceRect[currentActiveSprite].Height) <= sheetHeights[currentActiveSprite] && animationCounter[currentActiveSprite] <= frameAmounts[currentActiveSprite] )
-                {
-                    sourceRect[currentActiveSprite].X += sourceRect[currentActiveSprite].Width;
-                    animationCounter[currentActiveSprite]++;
-                }
-                else
-                {
-                    Hero.setBodyNull();
-                    Hero.setLegNull();
-                    resetAnimationValues();
-                }
-                 * */
             }
         }
 
