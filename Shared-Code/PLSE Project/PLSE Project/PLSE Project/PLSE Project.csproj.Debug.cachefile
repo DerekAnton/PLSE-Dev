@@ -143,3 +143,7 @@ Content\Sprites\Hero\MACHINE GUN\machine_gun_reloadup.xnb
 Content\Sprites\Hero\MACHINE GUN\machine_gun_shoot.xnb
 Content\Sprites\Hero\MACHINE GUN\machine_gun_shootdown.xnb
 Content\Sprites\Hero\MACHINE GUN\machine_gun_shootup.xnb
+Content\Sprites\UI\EnergyBarBack.xnb
+Content\Sprites\UI\EnergyBarFront.xnb
+Content\Sprites\UI\HealthBarBack.xnb
+Content\Sprites\UI\HealthBarFront.xnb

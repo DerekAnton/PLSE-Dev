@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 
-namespace PLSE_Project.Interfaces
+namespace PLSE_Project
 {
     class TransitionBodyPart : BodyPart
     {

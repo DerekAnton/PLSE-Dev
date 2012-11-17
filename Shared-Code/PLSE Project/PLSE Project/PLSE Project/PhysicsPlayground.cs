@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 
-namespace PLSE_Project.Interfaces
+namespace PLSE_Project
 {
 
     public class PhysicsPlayground : Microsoft.Xna.Framework.Game
@@ -20,7 +20,6 @@ namespace PLSE_Project.Interfaces
         
         KeyboardState keyState;
         KeyboardState oldKeyState;
-
 
         Viewport viewport;
         Rectangle viewportRect;
@@ -54,13 +53,17 @@ namespace PLSE_Project.Interfaces
             viewport = graphics.GraphicsDevice.Viewport;
             viewportRect = viewport.Bounds;
 
+            CameraManager.setViewportRect(viewportRect);
+
             hero.load(Content, 100, 100);
             floor = new Platform(Content, "platform");
             obstacle = new Platform(Content, "obstacle");
             hero.passPlatform(floor, obstacle);
 
-            hero.standingHitbox.X = (int)hero.body.position.X - 70;
-            hero.standingHitbox.Y = (int)hero.body.position.Y - 43;
+            hero.standingHitbox.X = (int)Hero.body.position.X - 70;
+            hero.standingHitbox.Y = (int)Hero.body.position.Y - 43;
+
+            UIManager.load(Content);
         }
 
         protected override void UnloadContent()
@@ -78,6 +81,9 @@ namespace PLSE_Project.Interfaces
             keyState = Keyboard.GetState();
 
             MouseState mouseState = Mouse.GetState();
+
+            if (keyState.IsKeyDown(Keys.Escape)) //  allows for game to exit //
+                this.Exit();
 
             hero.update(gameTime.ElapsedGameTime.Milliseconds, keyState, oldKeyState, viewportRect, gameTime); // Passed GameTime, The first parameter is only the first 16 miliseconds of the game that never updates...
             floor.update();
@@ -97,6 +103,7 @@ namespace PLSE_Project.Interfaces
             floor.draw(spriteBatch);
             obstacle.draw(spriteBatch);
             hero.draw(spriteBatch);
+            UIManager.draw(spriteBatch);
 
             // THIS IS FOR DEBUGGING HITBOXES , TAKE ME OUT //
             /*

@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework.Media;
 
 
 
-namespace PLSE_Project.Interfaces
+namespace PLSE_Project
 {
     public enum BodySpriteIndex { CrouchIdle, CrouchMagic, CrouchReload, CrouchShoot, Fall, GetHurt, HangIdle, Idle, IdleUp, Jump, Magic, MagicDown, MagicUp, PullTowards, PushAway, ReloadUp, Shoot, ShootDown, ShootUp }; 
     public enum LegSpriteIndex { CrouchWalk, Fall, GetHurt, Idle, Jump, Running, CrouchIdle  };
@@ -27,6 +27,12 @@ namespace PLSE_Project.Interfaces
 
     class Hero : Colideable
     {
+
+        private static double health = 800;
+        private static double maxHealth = 1000;
+        private static double energy = 100;
+        private static double maxEnergy = 100;
+
 
         private readonly int MILLISECOND_DELAY = 30; // used for frame limiting 
 
@@ -64,11 +70,11 @@ namespace PLSE_Project.Interfaces
         public Rectangle standingHitbox = new Rectangle(50, 50, 70, 145);
         public Rectangle crouchingHitbox;
 
-        public BodyPart body; 
-        public BodyPart legs;
+        public static BodyPart body; 
+        public static BodyPart legs;
         BodyPart singleSheet; // the single sheet body part is important for crouching & hanging since the legs/body are one full piece //
-        public TransitionBodyPart bodyTransitions; // the transition body part will break up the sprite sheets that have to do with changing a state i.e. from idle to crouching needs an quick animation played over the hero to transition it smoothly.//
-        public TransitionBodyPart legsTransitions;
+        public static TransitionBodyPart bodyTransitions; // the transition body part will break up the sprite sheets that have to do with changing a state i.e. from idle to crouching needs an quick animation played over the hero to transition it smoothly.//
+        public static TransitionBodyPart legsTransitions;
 
         HeroStates heroState = HeroStates.StandStill;
 
@@ -79,7 +85,7 @@ namespace PLSE_Project.Interfaces
         bool spriteFlipping = false; 
         bool crouching = false;
 
-        private bool onGround = true;
+       // private bool onGround = true;
         private bool isStandingHitbox = true; // only two types of hit boxes, standing and crouching, (crouching == !standing) //
         private bool offsetCheck = false;
         private bool facingRight = true;
@@ -115,6 +121,12 @@ namespace PLSE_Project.Interfaces
         public void update(double elapsedTime, KeyboardState keyState, KeyboardState oldKeyState, Rectangle viewportRect, GameTime gameTime)
         {
             handleFalling(gameTime);
+
+            if (firingmagic)
+                Hero.changeEnergy(-1);
+            else
+                Hero.changeEnergy(2);
+
         
             if (!(currentBodyTransition == BodyTransitionIndex.NULL))
             {
@@ -510,8 +522,6 @@ namespace PLSE_Project.Interfaces
                     body.setCurrentActiveSprite((int)BodySpriteIndex.MagicUp);
             }
 
-
-
         }
 
 
@@ -623,7 +633,46 @@ namespace PLSE_Project.Interfaces
             }
         }
 
-        
+
+        public static void setX(int x)
+        {
+            body.setXPos(x);
+            legs.setXPos(x);
+            bodyTransitions.setXPos(x);
+            legsTransitions.setXPos(x);
+        }
+        public static void setY(int y)
+        {
+            body.setYPos(y);
+            legs.setYPos(y - 80);
+            bodyTransitions.setYPos(y);
+            legsTransitions.setYPos(y - 80);
+        }
+
+        public static double getHealth()
+        {
+            return health;
+        }
+        public static double getMaxHealth()
+        {
+            return maxHealth;
+        }
+        public static double getEnergy()
+        {
+            return energy;
+        }
+        public static double getMaxEnergy()
+        {
+            return maxEnergy;
+        }
+        public static void changeEnergy(double changeAmount)
+        {
+            energy += changeAmount;
+            if (energy > maxEnergy)
+                energy = maxEnergy;
+        }
+
+
         private void jump()
         {
             jumpAcceleration = 32;
@@ -963,7 +1012,6 @@ namespace PLSE_Project.Interfaces
                 setTransitionCheckStrings(startOrEnd);
             }
         }
-
         private void drawShootingMagicTransition(string startOrEnd)
         {
             if (startOrEnd.Equals("magicstart"))
@@ -1039,9 +1087,6 @@ namespace PLSE_Project.Interfaces
                 setTransitionCheckStrings(startOrEnd);
             }
         }
-
-
-
 
         private void drawCrouchingTransition(KeyboardState keyState, KeyboardState oldKeySate)
         {

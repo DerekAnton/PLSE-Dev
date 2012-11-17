@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 
-namespace PLSE_Project.Interfaces
+namespace PLSE_Project
 {
     class BodyPart // Danton // 
     {
@@ -39,8 +39,9 @@ namespace PLSE_Project.Interfaces
             this.sourceRect = new Rectangle[this.amountOfSheets];
             this.lengthOfTimePerFrame = new int[this.amountOfSheets];
             this.animationCounter = new int[this.amountOfSheets];
-            this.position.X = startingPos.X;
-            this.position.Y = startingPos.Y;
+            
+            setXPos((int)startingPos.X); // this needs to come out // 
+            setYPos((int)startingPos.Y);
             
             for (int counter = 0; counter < amountOfSheets; counter++)
             {
@@ -73,13 +74,22 @@ namespace PLSE_Project.Interfaces
        
         public void move(int movespeed) 
         {
-                position.X += movespeed;
+            position.X += movespeed;
         }
         public void unDoMove(int movespeed)
         {
             position.X -= movespeed;
         }
-       
+
+        public void setXPos(int x)
+        {
+            position.X = x;
+        }
+        public void setYPos(int y)
+        {
+            position.Y = y;
+        }
+
         public void animate(GameTime gameTime) // called in an update method  //
         {
             frameLimiter += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
