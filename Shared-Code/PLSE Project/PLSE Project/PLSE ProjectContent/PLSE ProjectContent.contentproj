@@ -42,6 +42,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Levels\" />
     <Folder Include="Sprites\Hero\MACHINE GUN\" />
     <Folder Include="Sprites\Hero\RIFLE\" />
     <Folder Include="Sprites\Hero\ROCKET\" />
@@ -370,6 +371,42 @@
   <ItemGroup>
     <Compile Include="Sprites\Hero\ADV RIFLE\adv_rifle_crouchidle.png">
       <Name>adv_rifle_crouchidle</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\UI\HealthBarBack.png">
+      <Name>HealthBarBack</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\UI\HealthBarFront.png">
+      <Name>HealthBarFront</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Tahoma.spritefont">
+      <Name>Tahoma</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+      <SubType>Designer</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\UI\EnergyBarBack.png">
+      <Name>EnergyBarBack</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\UI\EnergyBarFront.png">
+      <Name>EnergyBarFront</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

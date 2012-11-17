@@ -111,15 +111,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccelVec.cs" />
+    <Compile Include="Camera\Boundry.cs" />
+    <Compile Include="Camera\CameraManager.cs" />
     <Compile Include="Direction.cs" />
     <Compile Include="Hero.cs" />
-    <Compile Include="Colideable.cs" />
+    <Compile Include="Load&amp;Save\LevelReader.cs" />
+    <Compile Include="MapEntities\Colideable.cs" />
     <Compile Include="BodyPart.cs" />
-    <Compile Include="Obstacle.cs" />
+    <Compile Include="MapEntities\Obstacle.cs" />
+    <Compile Include="MapEntities\ObstacleManager.cs" />
     <Compile Include="PhysicsManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="PhysicsPlayground.cs" />
+    <Compile Include="Camera\UIManager.cs" />
+    <Compile Include="Load&amp;Save\XMLSaver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

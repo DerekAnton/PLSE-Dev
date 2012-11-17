@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework.Media;
 
 
 
-namespace PLSE_Project.Interfaces
+namespace PLSE_Project
 {
     public enum BodySpriteIndex { BodyCrouch, BodyUncrouch, BodyStillCrouch, BodyRun, BodyStill}; // order in which the sprite sheets will be stored in the Texture2D array inside of the BodyPart Obj
     public enum LegSpriteIndex { LegCrouch, LegUncrouch, LegStillCrouch, LegRun, LegStill }; // Danton //
@@ -30,6 +30,11 @@ namespace PLSE_Project.Interfaces
         private int movespeed = 5;
         public Rectangle hitbox;
 
+        private static double health = 800;
+        private static double maxHealth = 1000;
+        private static double energy = 100;
+        private static double maxEnergy = 100;
+
         // hard coded values for the starting position of the leg sprites and the body sprites
         private Vector2 legsStartPos = new Vector2(130,275);
         private Vector2 bodyStartPos = new Vector2(165,190);
@@ -43,7 +48,7 @@ namespace PLSE_Project.Interfaces
 
         Vector2 mousePosition = new Vector2(0, 0);
 
-        private Rectangle rect; // old rect
+        private static Rectangle rect; // old rect
         private Vector2 origin; // old origin
 
         private const int maxJumpCount = 1;
@@ -379,6 +384,43 @@ namespace PLSE_Project.Interfaces
             imgPaths = new string[5];
             startingPos = new Vector2[5];
             spriteDelayTimes = new int[5];
+        }
+
+        public static void setX(int x)
+        {
+            rect.X = x;
+        }
+
+        public static void setY(int y)
+        {
+            rect.Y = y;
+        }
+
+        public static double getHealth()
+        {
+            return health;
+        }
+
+        public static double getMaxHealth()
+        {
+            return maxHealth;
+        }
+
+        public static double getEnergy()
+        {
+            return energy;
+        }
+
+        public static double getMaxEnergy()
+        {
+            return maxEnergy;
+        }
+
+        public static void changeEnergy(double changeAmount)
+        {
+            energy += changeAmount;
+            if (energy > maxEnergy)
+                energy = maxEnergy;
         }
     }
 }

@@ -1,8 +1,3 @@
-Content\Sprites\Hero\bodyidle.xnb
-Content\Sprites\Hero\bodyrun.xnb
-Content\Sprites\Hero\legscrouchwalk.xnb
-Content\Sprites\Hero\legsidle.xnb
-Content\Sprites\Hero\legsrunning.xnb
 Content\Sprites\Hero\ADV RIFLE\adv_rifle_crouch.xnb
 Content\Sprites\Hero\ADV RIFLE\adv_rifle_crouchendreload.xnb
 Content\Sprites\Hero\ADV RIFLE\adv_rifle_crouchholster.xnb
@@ -67,3 +62,8 @@ Content\Sprites\Hero\LEGS\startrun.xnb
 Content\Sprites\Hero\LEGS\turn.xnb
 Content\Sprites\Hero\LEGS\uncrouch.xnb
 Content\Sprites\Hero\ADV RIFLE\adv_rifle_crouchidle.xnb
+Content\Sprites\UI\HealthBarBack.xnb
+Content\Sprites\UI\HealthBarFront.xnb
+Content\Sprites\UI\EnergyBarBack.xnb
+Content\Sprites\UI\EnergyBarFront.xnb
+Content\Tahoma.xnb

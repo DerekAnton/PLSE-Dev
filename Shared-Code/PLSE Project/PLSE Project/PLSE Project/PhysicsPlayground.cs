@@ -27,6 +27,9 @@ namespace PLSE_Project.Interfaces
         public PhysicsPlayground()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferWidth = 1920;
+            graphics.PreferredBackBufferHeight = 1080;
+            graphics.IsFullScreen = true;
             this.IsMouseVisible = true;
             Content.RootDirectory = "Content";
         }
@@ -44,8 +47,10 @@ namespace PLSE_Project.Interfaces
 
             viewport = graphics.GraphicsDevice.Viewport;
             viewportRect = viewport.Bounds;
-
+            CameraManager.setViewportRect(viewportRect);
             hero.load(Content, 100, 100);
+
+            UIManager.load(Content);
         }
 
         protected override void UnloadContent()
@@ -61,7 +66,13 @@ namespace PLSE_Project.Interfaces
             KeyboardState keyState = Keyboard.GetState();
             MouseState mouseState = Mouse.GetState();
 
+            //Allows the game to exit
+            if (keyState.IsKeyDown(Keys.Escape))
+                this.Exit();
+
             hero.update(gameTime.ElapsedGameTime.Milliseconds, keyState, mouseState, viewportRect, gameTime); // Passed GameTime, The first parameter is only the first 16 miliseconds of the game that never updates...
+
+            UIManager.update(keyState.IsKeyDown(Keys.M));
 
             base.Update(gameTime);
         }
@@ -72,7 +83,9 @@ namespace PLSE_Project.Interfaces
 
             spriteBatch.Begin();
 
-            hero.draw(spriteBatch); 
+            hero.draw(spriteBatch);
+
+            UIManager.draw(spriteBatch);
 
             spriteBatch.End();
             base.Draw(gameTime);
