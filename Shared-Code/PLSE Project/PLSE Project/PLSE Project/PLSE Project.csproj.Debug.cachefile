@@ -1,8 +1,13 @@
+Content\Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_crouchholster.xnb
+Content\Sprites\Hero\ADV RIFLE\adv_rifle_crouchidle.xnb
 Content\Sprites\Hero\ADV RIFLE\adv_rifle_crouchmagic.xnb
 Content\Sprites\Hero\ADV RIFLE\adv_rifle_crouchshoot.xnb
+Content\Sprites\Hero\ADV RIFLE\adv_rifle_crouchreload.xnb
+Content\Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_crouchunholster.xnb
 Content\Sprites\Hero\ADV RIFLE\adv_rifle_fall.xnb
 Content\Sprites\Hero\ADV RIFLE\adv_rifle_gethurt.xnb
 Content\Sprites\Hero\ADV RIFLE\adv_rifle_hangidle.xnb
+Content\Sprites\Hero\ADV RIFLE\adv_rifle_rally.xnb
 Content\Sprites\Hero\ADV RIFLE\adv_rifle_idle.xnb
 Content\Sprites\Hero\ADV RIFLE\adv_rifle_idledown.xnb
 Content\Sprites\Hero\ADV RIFLE\adv_rifle_idleup.xnb
@@ -15,10 +20,8 @@ Content\Sprites\Hero\ADV RIFLE\adv_rifle_pushaway.xnb
 Content\Sprites\Hero\ADV RIFLE\adv_rifle_shoot.xnb
 Content\Sprites\Hero\ADV RIFLE\adv_rifle_shootdown.xnb
 Content\Sprites\Hero\ADV RIFLE\adv_rifle_shootup.xnb
-Content\Sprites\Hero\LEGS\crouchwalk.xnb
-Content\Sprites\Hero\LEGS\idle.xnb
-Content\Sprites\Hero\LEGS\running.xnb
-Content\Sprites\Hero\ADV RIFLE\adv_rifle_crouchidle.xnb
+Content\Sprites\Hero\ADV RIFLE\adv_rifle_reload.xnb
+Content\Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_turndown.xnb
 Content\Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_crouch.xnb
 Content\Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_crouchturn.xnb
 Content\Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_hoist.xnb
@@ -33,34 +36,24 @@ Content\Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_unholster.xnb
 Content\Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_uptomid.xnb
 Content\Sprites\Hero\LEGS\Transitions\crouch.xnb
 Content\Sprites\Hero\LEGS\Transitions\uncrouch.xnb
-Content\Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_crouchholster.xnb
-Content\Sprites\Hero\ADV RIFLE\adv_rifle_crouchreload.xnb
-Content\Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_crouchunholster.xnb
-Content\Sprites\Hero\ADV RIFLE\adv_rifle_rally.xnb
-Content\Sprites\Hero\ADV RIFLE\adv_rifle_reload.xnb
-Content\Sprites\Hero\ADV RIFLE\Transitions\adv_rifle_turndown.xnb
+Content\Sprites\Hero\LEGS\crouchwalk.xnb
 Content\Sprites\Hero\LEGS\fall.xnb
 Content\Sprites\Hero\LEGS\gethurt.xnb
+Content\Sprites\Hero\LEGS\idle.xnb
 Content\Sprites\Hero\LEGS\jump.xnb
+Content\Sprites\Hero\LEGS\running.xnb
 Content\Sprites\platform.xnb
+Content\Sprites\obstacle.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_crouch.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_crouchholster.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_crouchturn.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_grabledge.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_hoist.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_holster.xnb
-Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_letgo.xnb
-Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_lowtomid.xnb
-Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_midtolow.xnb
-Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_midtoup.xnb
-Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_turn.xnb
-Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_turndown.xnb
-Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_turnup.xnb
-Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_uncrouch.xnb
-Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_uptomid.xnb
-Content\Sprites\obstacle.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_holsterdown.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_holsterup.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_letgo.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_lowtomid.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_magiccrouchend.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_magiccrouchstart.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_magicdownend.xnb
@@ -69,6 +62,8 @@ Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_magicend.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_magicstart.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_magicupend.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_magicupstart.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_midtolow.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_midtoup.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_shootcrouchend.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_shootcrouchstart.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_shootdownend.xnb
@@ -77,6 +72,11 @@ Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_shootend.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_shootstart.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_shootupend.xnb
 Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_shootupstart.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_turn.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_turndown.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_turnup.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_uncrouch.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_uptomid.xnb
 Content\Sprites\Hero\PISTOL\pistol_crouchidle.xnb
 Content\Sprites\Hero\PISTOL\pistol_crouchmagic.xnb
 Content\Sprites\Hero\PISTOL\pistol_crouchreload.xnb

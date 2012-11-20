@@ -85,7 +85,7 @@ namespace PLSE_Project
             switch (elementName)
             {
                 case "Map":
-                    //Do Stuff with width, height and name
+                    CameraManager.addLevelRect(x, y, width, height);
                     break;
                 case "Hero":
                     Hero.setX(x);
@@ -102,9 +102,10 @@ namespace PLSE_Project
                     break;
                 case "GrabPoint": //figure out how derek's doing ledge grabbing
                     break;
-
+                case "CollisionRect":
+                    ObstacleManager.addCollisionRectangle(x, y, width, height);
+                    break;
             }
-
         }
     }
 }

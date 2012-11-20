@@ -64,6 +64,10 @@ namespace PLSE_Project
             hero.standingHitbox.Y = (int)Hero.body.position.Y - 43;
 
             UIManager.load(Content);
+
+            // For Camera logic currently causes errors so is commented out ~Jordan
+            //LevelReader.loadLevel(Content, 1);
+            //ObstacleManager.finishedLoading();
         }
 
         protected override void UnloadContent()
@@ -85,8 +89,11 @@ namespace PLSE_Project
             if (keyState.IsKeyDown(Keys.Escape)) //  allows for game to exit //
                 this.Exit();
 
+
+
             hero.update(gameTime.ElapsedGameTime.Milliseconds, keyState, oldKeyState, viewportRect, gameTime); // Passed GameTime, The first parameter is only the first 16 miliseconds of the game that never updates...
             floor.update();
+
 
 
             base.Update(gameTime);

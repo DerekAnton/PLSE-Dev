@@ -11,6 +11,8 @@ namespace PLSE_Project
     class ObstacleManager
     {
         private static LinkedList<Obstacle> foreground, midground, background;
+        private static LinkedList<Rectangle> collisionRectsLoaded;
+        private static Rectangle[] collisionRectsOrignal, collisionRectsShifted;
 
         public static void addObstacle(ContentManager content, string imgPath, int x, int y, string layer)
         {
@@ -30,6 +32,15 @@ namespace PLSE_Project
             }
         }
 
+        public static void finishedLoading()
+        {
+            collisionRectsOrignal = collisionRectsLoaded.ToArray<Rectangle>();
+            collisionRectsLoaded = null;
+
+            collisionRectsShifted = collisionRectsOrignal;
+        }
+
+
         public static void update()
         {
             foreach (Obstacle ob in foreground)
@@ -38,6 +49,12 @@ namespace PLSE_Project
                 ob.update();
             foreach (Obstacle ob in background)
                 ob.update();
+
+            for(int i=0; i < collisionRectsShifted.Length; i++)
+            {
+                collisionRectsShifted[i].X = collisionRectsOrignal[i].X + CameraManager.getXOffset();
+                collisionRectsShifted[i].Y = collisionRectsOrignal[i].Y + CameraManager.getYOffset();
+            }
         }
 
         public static void drawForeground(SpriteBatch spriteBatch)
@@ -67,9 +84,23 @@ namespace PLSE_Project
             }
         }
 
-        public static LinkedList<Obstacle> getColisionObstacles()
+        public static void addCollisionRectangle(int x, int y, int width, int height)
         {
-            return midground;
+            collisionRectsLoaded.AddFirst(new Rectangle(x, y, width, height));
+        }
+        public static void addCollisionRectangle(Rectangle rect)
+        {
+            collisionRectsLoaded.AddFirst(rect);
+        }
+
+        public static Rectangle[] getColisionObstacles()
+        {
+            return collisionRectsShifted;
+        }
+
+        public static void reset()
+        {
+            collisionRectsShifted = collisionRectsOrignal;
         }
     }
 }

@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Level>
+  <!-- Sample Level not final ~Jordan. -->
+  <!-- Map information should be here (Name, Width, Height, X+Y -->
+  <Map>
+	<Name>Map1</Name>
+	<Width>1920</Width>
+	<Height>1080</Height>
+	<X>0</X>
+	<Y>0</Y>
+  </Map>
+  <!-- Hero X + Y should be here -->
+  <Hero>
+	<X>100</X>
+	<Y>100</Y>
+  </Hero>
+  <!-- Insert Terrain info below in multiple Terrain wrappers (X,Y, ImgPath) -->
+  <Terrain>
+	<X>0</X>
+	<Y>400</Y>
+	<ImgPath>Sprites//platform</ImgPath>
+  </Terrain>
+  <Terrain>
+	<X>400</X>
+	<Y>250</X>
+	<ImgPath>Sprites//obstacle</ImgPath>
+  </Terrain>
+  <!-- Insert Collision Rectangle info below in multiple CollisionRect wrappers (X, Y, Width, Height)-->
+  <CollisionRect>
+  <X>0</X>
+  <Y>400</Y>
+  <Width>132</Width>
+  <Height>164</Height>
+  </CollisionRect>
+  <CollisionRect>
+	<X>400</X>
+	<Y>250</Y>
+	<Width>794</Width>
+	<Height>36</Height>
+  </CollisionRect>
+</Level>

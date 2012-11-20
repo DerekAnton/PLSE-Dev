@@ -6,9 +6,9 @@ namespace PLSE_Project
     public enum Layer { Foreground, Background, Midground };
     class Obstacle : Colideable
     {
-        private Rectangle rect;
+        private Rectangle originalRect;
         private Rectangle collisionRect;
-        private Rectangle drawRect;
+        private Rectangle shiftedRect;
         private Texture2D texture;
         private bool onScreen;
 
@@ -19,8 +19,8 @@ namespace PLSE_Project
             //and the loading of images will probably be abstraced to a load method.
             texture = content.Load<Texture2D>(imgPath);
 
-            rect = new Rectangle(x, y, texture.Width, texture.Height);
-            drawRect = new Rectangle(x, y, texture.Width, texture.Height);
+            originalRect = new Rectangle(x, y, texture.Width, texture.Height);
+            shiftedRect = new Rectangle(x, y, texture.Width, texture.Height);
         }
 
         public Obstacle(int x, int y, int width, int height, string imgPath, ContentManager content)
@@ -30,18 +30,18 @@ namespace PLSE_Project
             //and the loading of images will probably be abstraced to a load method.
             texture = content.Load<Texture2D>(imgPath);
 
-            rect = new Rectangle(x, y, width, height);
-            drawRect = new Rectangle(x, y, texture.Width, texture.Height);
+            originalRect = new Rectangle(x, y, width, height);
+            shiftedRect = new Rectangle(x, y, texture.Width, texture.Height);
         }
 
         public bool intersects(Rectangle rectangle)
         {
-            return rect.Intersects(rectangle);
+            return shiftedRect.Intersects(rectangle);
         }
 
         public bool intersects(Colideable obj)
         {
-            return rect.Intersects(obj.getRect());
+            return shiftedRect.Intersects(obj.getRect());
         }
 
         public bool isOnScreen()
@@ -51,18 +51,20 @@ namespace PLSE_Project
 
         public Rectangle getRect()
         {
-            return rect;
+            return shiftedRect;
         }
 
         public void update()
         {
-            onScreen = CameraManager.getViewportRect().Intersects(rect) || CameraManager.getViewportRect().Contains(rect);
-            CameraManager.getXOffset();
+            shiftedRect.X = originalRect.X + CameraManager.getXOffset();
+            shiftedRect.Y = originalRect.Y + CameraManager.getYOffset();
+
+            onScreen = CameraManager.getViewportRect().Intersects(shiftedRect) || CameraManager.getViewportRect().Contains(shiftedRect);
         }
 
         public void draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(texture, drawRect, Color.White);
+            spriteBatch.Draw(texture, shiftedRect, Color.White);
         }        
     }
 }
