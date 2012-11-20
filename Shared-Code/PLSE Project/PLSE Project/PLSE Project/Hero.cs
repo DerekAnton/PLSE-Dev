@@ -12,52 +12,69 @@ using Microsoft.Xna.Framework.Media;
 
 
 
-namespace PLSE_Project.Interfaces
+namespace PLSE_Project
 {
     public enum BodySpriteIndex { CrouchIdle, CrouchMagic, CrouchReload, CrouchShoot, Fall, GetHurt, HangIdle, Idle, IdleUp, Jump, Magic, MagicDown, MagicUp, PullTowards, PushAway, ReloadUp, Shoot, ShootDown, ShootUp }; 
-    public enum LegSpriteIndex { CrouchWalk, Fall, GetHurt, Idle, Jump, Running, CrouchIdle  }; 
+    public enum LegSpriteIndex { CrouchWalk, Fall, GetHurt, Idle, Jump, Running, CrouchIdle  };
 
-    public enum BodyTransitionIndex { Crouch, CrouchHolster, CrouchTurn, /*CrouchUnHolster,*/ Hoist, Holster, LowToMid, MidToLow, MidToUp, Turn, TurnDown, TurnUp, UnCrouch, /*UnHolster,*/ UpToMid, NULL };
+    public enum BodyTransitionIndex { Crouch, CrouchHolster, CrouchTurn, /*new*/GrabLedge, Hoist, Holster, /*new*/HolsterDown, /*new*/HolsterUp, /*new*/LetGo, LowToMid,
+        /*new*/MagicCrouchEnd, /*new*/MagicCrouchStart,/*new*/ MagicDownEnd, /*new*/MagicDownStart, /*new*/MagicEnd, /*new*/MagicStart, /*new*/MagicUpEnd, /*new*/MagicUpStart, MidToLow, MidToUp, 
+        /*new*/ShootCrouchEnd, /*new*/ShootCrouchStart, /*new*/ShootDownEnd, /*new*/ShootDownStart, /*new*/ShootEnd, /*new*/ShootStart, /*new*/ShootUpEnd, /*new*/ShootUpStart, Turn, TurnDown, 
+        TurnUp, UnCrouch, UpToMid, NULL };
     public enum LegTransitionIndex { Crouch, EndRun, FallTurn, JumpTurn, StartRun, Turn, UnCrouch, NULL };
 
-    public enum SingleSheetIndex { /*TBA*/ };
     public enum HeroStates { StandStill, CrouchStill, CrouchWalking, Running, Jumping};
 
     class Hero : Colideable
     {
 
+        private static double health = 800;
+        private static double maxHealth = 1000;
+        private static double energy = 100;
+        private static double maxEnergy = 100;
+
+
         private readonly int MILLISECOND_DELAY = 30; // used for frame limiting 
 
-        private Platform floor; // for debugging jumping & collision only //
-        private Platform obstacle; 
+        private Platform floor; // for debugging jumping & collision only (test harness before i recieve Jordan's level loading)//
+        private Platform obstacle;
 
-        // staging arrays for the start of a new BodyPart Object //
-        private int amountOfSheets;
+        // STAGING ARRAYS //
+        private Vector2 startingPos; 
+        private int[] spriteDelayTimes; // staging arrays that are filled with essential information for sprite loading thbat is delegated to each body part / transitional body part object //
         private int[] frameAmounts; 
-        private Rectangle[] frameRects;
+        private Rectangle[] frameRects; 
         private string[] imgPaths;
-        private Vector2 startingPos;
-        private int[] spriteDelayTimes;
-        private int movespeed = 5;
-        
-        public Rectangle standingHitbox = new Rectangle(50,50,70,145);
-        public Rectangle crouchingHitbox;
 
+        private const float speed = 3.0f;
+        private Vector2 legsStartPos = new Vector2(115, 270);
+        private Vector2 bodyStartPos = new Vector2(165, 190);
+        private int movespeed = 5;
+        private int amountOfSheets; 
         private string bodyString = ""; 
         private string legString = "";
+        // JUMPING VARIABLES //
+        private bool airborn = false;
+        private bool doubleJumping = false;
+        private bool falling = false;
+        private int jumpAcceleration = 0;
+        private int horizontalJumpInertia = 0;
+        private int frameLimiter = 0;
+        private int jumpsLeft = 2;
+
+        private bool firing = false;
+        private bool firingmagic = false;
 
         public int legOffset = 0;
         public int bodyOffset = 0;
+        public Rectangle standingHitbox = new Rectangle(50, 50, 70, 145);
+        public Rectangle crouchingHitbox;
 
-        // hard coded values for the starting position of the leg sprites and the body sprites //
-        private Vector2 legsStartPos = new Vector2(115,270);
-        private Vector2 bodyStartPos = new Vector2(165,190);
-
-        public BodyPart body; 
-        public BodyPart legs;
+        public static BodyPart body; 
+        public static BodyPart legs;
         BodyPart singleSheet; // the single sheet body part is important for crouching & hanging since the legs/body are one full piece //
-        public TransitionBodyPart bodyTransitions; // the transition body part will break up the sprite sheets that have to do with changing a state i.e. from idle to crouching needs an quick animation played over the hero to transition it smoothly.//
-        public TransitionBodyPart legsTransitions;
+        public static TransitionBodyPart bodyTransitions; // the transition body part will break up the sprite sheets that have to do with changing a state i.e. from idle to crouching needs an quick animation played over the hero to transition it smoothly.//
+        public static TransitionBodyPart legsTransitions;
 
         HeroStates heroState = HeroStates.StandStill;
 
@@ -68,27 +85,13 @@ namespace PLSE_Project.Interfaces
         bool spriteFlipping = false; 
         bool crouching = false;
 
-        private const int maxJumpCount = 1;
-        private int jumpCount = maxJumpCount;
-        private const double jumpTime = 90;
-        private const float jumpSpeed = 1.5f;
-        //private bool jumping = false;
-        private AccelVec jumpVec;
-
-        // JUMPING VARIABLES //
-        private bool airborn = false;
-        private bool doubleJumping = false;
-        private bool falling = false;
-        private int jumpAcceleration = 0;
-        private int horizontalJumpInertia = 0;
-        private int frameLimiter = 0;
-
-        private bool onGround = true;
-        private bool isStandingHitbox = true; // only two types of hit boxes, standing and crouching, (crouching == !standing)
+       // private bool onGround = true;
+        private bool isStandingHitbox = true; // only two types of hit boxes, standing and crouching, (crouching == !standing) //
         private bool offsetCheck = false;
         private bool facingRight = true;
+        bool facingUp = false;
 
-        private const float speed = 3.0f;
+        private bool movementlock = false; // used specificly to choose a direction when the player hits down, right, and left all at the same time (so we dont end up adding and subtracting a movement in the air, and effectivley moving nowhere)
 
         public Hero() { }
 
@@ -118,6 +121,12 @@ namespace PLSE_Project.Interfaces
         public void update(double elapsedTime, KeyboardState keyState, KeyboardState oldKeyState, Rectangle viewportRect, GameTime gameTime)
         {
             handleFalling(gameTime);
+
+            if (firingmagic)
+                Hero.changeEnergy(-1);
+            else
+                Hero.changeEnergy(2);
+
         
             if (!(currentBodyTransition == BodyTransitionIndex.NULL))
             {
@@ -142,6 +151,7 @@ namespace PLSE_Project.Interfaces
                 body.animate(gameTime);
                 legs.animate(gameTime);
             }
+            movementlock = false;
             move(keyState, oldKeyState, viewportRect, elapsedTime, gameTime);
         }
 
@@ -152,12 +162,13 @@ namespace PLSE_Project.Interfaces
 
                 if (!(currentBodyTransition == BodyTransitionIndex.NULL))
                 {
-                    bodyTransitions.draw(spriteBatch, spriteFlipping);
-
                     if (!(currentLegTransition == LegTransitionIndex.NULL))
                         legsTransitions.draw(spriteBatch, spriteFlipping);
                     else
                         legs.draw(spriteBatch, spriteFlipping);
+
+                    bodyTransitions.draw(spriteBatch, spriteFlipping);
+
                 }
                 else if (!(currentLegTransition == LegTransitionIndex.NULL))
                 {
@@ -179,12 +190,12 @@ namespace PLSE_Project.Interfaces
 
                 if (!(currentBodyTransition == BodyTransitionIndex.NULL))
                 {
-                    bodyTransitions.draw(spriteBatch, spriteFlipping);
-
                     if (!(currentLegTransition == LegTransitionIndex.NULL))
                         legsTransitions.draw(spriteBatch, spriteFlipping);
                     else
                         legs.draw(spriteBatch, spriteFlipping);
+
+                    bodyTransitions.draw(spriteBatch, spriteFlipping);
                 }
                 else if (!(currentLegTransition == LegTransitionIndex.NULL))
                 {
@@ -205,65 +216,38 @@ namespace PLSE_Project.Interfaces
 
         private void move(KeyboardState keyState, KeyboardState oldKeyState, Rectangle viewportRect, double elapsedTime, GameTime gameTime)
         {
-            //bodyTransitions.setPrintMe(true);
-            legsTransitions.setPrintMe(true);
-            body.setPrintMe(true);
-
-
-            if (keyState.IsKeyDown(Keys.Space))
+            // Jumping Logic // 
+            if (keyState.IsKeyDown(Keys.Space) && !oldKeyState.IsKeyDown(Keys.Space))
             {
-                jump();
+                if (jumpsLeft <= 2 && jumpsLeft > 0)
+                {
+                    heroState = HeroStates.Jumping;
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.Jump);
+                    legs.setCurrentActiveSprite((int)LegSpriteIndex.Jump);
+                    setCheckStrings("jumping");
+                    jump();
+                }
             }
 
-            if (heroState == HeroStates.StandStill && !oldKeyState.IsKeyDown(Keys.Down) && keyState.IsKeyDown(Keys.Down)) // case for idle -> crouch transition
+            // Idle To Crouch Transition Cases //            
+            if (heroState == HeroStates.StandStill && !oldKeyState.IsKeyDown(Keys.Down) && keyState.IsKeyDown(Keys.Down) && !airborn) // case for idle -> crouch transition
                 drawCrouchingTransition(keyState, oldKeyState);
-            if ((heroState == HeroStates.CrouchStill || heroState == HeroStates.CrouchWalking) && oldKeyState.IsKeyDown(Keys.Down) && keyState.IsKeyUp(Keys.Down)) // case for crouch/crouchwalking -> uncrouch transition
+            if ((heroState == HeroStates.CrouchStill || heroState == HeroStates.CrouchWalking) && oldKeyState.IsKeyDown(Keys.Down) && keyState.IsKeyUp(Keys.Down) && !airborn) // case for crouch/crouchwalking -> uncrouch transition
                 drawUnCrouchingTransition(keyState, oldKeyState);
-
-            if (keyState.IsKeyDown(Keys.Down) && (!keyState.IsKeyDown(Keys.Right) || !keyState.IsKeyDown(Keys.Left)) && onGround) // case for crouch //
+          
+            // Crouch Idle //
+            if (keyState.IsKeyDown(Keys.Down) && (!keyState.IsKeyDown(Keys.Right) || !keyState.IsKeyDown(Keys.Left)) && !airborn)
             {
                 crouching = true;
                 heroState = HeroStates.CrouchStill;
                 body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
                 legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
                  
-                 
                 setCheckStrings("crouchidle");
-
-                //checkMidToUpConditions(keyState, oldKeyState);
-                //checkUpToMidConditions(keyState, oldKeyState);
             }
             
-            if (keyState.IsKeyDown(Keys.Down) && (keyState.IsKeyDown(Keys.Right) || keyState.IsKeyDown(Keys.Left)) && onGround) // case for moving into crouch  //
-            {
-                if (keyState.IsKeyDown(Keys.Left))
-                {
-                    spriteFlipping = true;
-                    setLegsOffsetTrue();
-                }
-                else
-                {
-                    spriteFlipping = false;
-                    setLegsOffsetFalse();
-                }
-
-                if (!oldKeyState.IsKeyDown(Keys.Down) && keyState.IsKeyDown(Keys.Down))
-                {
-                    drawCrouchingTransition(keyState, oldKeyState);
-                     
-                }
-                else
-                {
-                    crouching = true;
-                    heroState = HeroStates.CrouchWalking;
-                    body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
-                    legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
-                    //checkMidToUpConditions(keyState, oldKeyState);
-                    //checkUpToMidConditions(keyState, oldKeyState);
-                }
-            }
-
-            if ( keyState.IsKeyUp(Keys.Down) &&  (!keyState.IsKeyDown(Keys.Right) || !keyState.IsKeyDown(Keys.Left)) && onGround) // case for standing still //
+            // Hero Idle //
+            if ( keyState.IsKeyUp(Keys.Down) &&  (!keyState.IsKeyDown(Keys.Right) || !keyState.IsKeyDown(Keys.Left))) 
             {
                 crouching = false;
                 heroState = HeroStates.StandStill;
@@ -274,98 +258,271 @@ namespace PLSE_Project.Interfaces
                 checkUpToMidConditions(keyState, oldKeyState);
             }
 
-            if (keyState.IsKeyDown(Keys.Right)) // case for walking right & crouch walking & pressing left and right //
+            // Hero Walking Right Conditions (Right Walking, Right Crouch Walking, Etc...) //
+            if (keyState.IsKeyDown(Keys.Right))
             {
-                if (keyState.IsKeyDown(Keys.Down))
+                if (keyState.IsKeyDown(Keys.Down)) // Right Down //
                 {
                     spriteFlipping = false;
-                    setLegsOffsetFalse();
                     crouching = true;
-                    heroState = HeroStates.CrouchWalking;
-                    moveRight(gameTime);
-                    body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
-                    
-                    if(!keyState.IsKeyDown(Keys.Left))
-                        legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchWalk);
-                    else
-                        legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
-                   // checkMidToUpConditions(keyState, oldKeyState);
-                    //checkUpToMidConditions(keyState, oldKeyState);
-                }
-                else if(keyState.IsKeyDown(Keys.Left))
-                {
-                    crouching = false;
-                    heroState = HeroStates.StandStill;
-                    body.setCurrentActiveSprite((int)BodySpriteIndex.Idle);
+                    checkFacingLeft(keyState, oldKeyState);
+                    setLegsOffsetFalse();
 
-                    if (!keyState.IsKeyDown(Keys.Down))
-                        legs.setCurrentActiveSprite((int)LegSpriteIndex.Idle);
-                    else
+                    // Crouching Transitions //
+                    if (!oldKeyState.IsKeyDown(Keys.Down) && keyState.IsKeyDown(Keys.Down) && !airborn)
+                        drawCrouchingTransition(keyState, oldKeyState);
+                    else if (keyState.IsKeyDown(Keys.Down) && oldKeyState.IsKeyDown(Keys.Up) && !keyState.IsKeyDown(Keys.Up) && !airborn)
+                        drawCrouchingTransition(keyState, oldKeyState);
+                    
+                    // Crouch Walking Right Condition //
+                    if (keyState.IsKeyDown(Keys.Left) && !airborn)                                       // condition for right, down, left & not airborn //
+                    {
+                        heroState = HeroStates.CrouchStill;
+                        body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
                         legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
+                    }
+                    else if (!keyState.IsKeyDown(Keys.Left) && !airborn)                                 // condition for crouched movement (right) on ground//
+                    {
+                        body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchWalk);
+                        moveRight(gameTime);
+                    }
+                    else if (keyState.IsKeyDown(Keys.Left) && airborn)                                   // right down left and airborn //
+                    {
+                        crouching = false;
+                        body.setCurrentActiveSprite((int)BodySpriteIndex.ShootDown);
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.Jump);
+                        if (!movementlock)
+                        {
+                            moveRight(gameTime);
+                            movementlock = true;
+                        }
+                    }
+                    else if (!keyState.IsKeyDown(Keys.Left) && airborn)                                  // right and down and airborn //
+                    {
+                        crouching = false;
+                        body.setCurrentActiveSprite((int)BodySpriteIndex.ShootDown);
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.Jump);
+                        if (!movementlock)
+                        {
+                            moveRight(gameTime);
+                            movementlock = true;
+                        }
+                    } 
+                }
+                else if(keyState.IsKeyDown(Keys.Left)) // Right Left //
+                {
+                    spriteFlipping = false;
+                    crouching = false;
+                    checkFacingLeft(keyState, oldKeyState);
+                    setLegsOffsetFalse();
+
+                    if (!keyState.IsKeyDown(Keys.Down) && !airborn)                                     // case for right left & not airborn//
+                    {
+                        crouching = false;
+                        body.setCurrentActiveSprite((int)BodySpriteIndex.Idle);
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.Idle);
+                    }
+                    else if (keyState.IsKeyDown(Keys.Down) && !airborn)                                 // right left down (not in the air) [Results in crouch idle] // 
+                    {
+                        crouching = true;
+                        heroState = HeroStates.CrouchStill;
+
+                        // Crouching Transitions //
+                        if (!oldKeyState.IsKeyDown(Keys.Down) && keyState.IsKeyDown(Keys.Down) && !airborn)
+                            drawCrouchingTransition(keyState, oldKeyState);
+                        else if (keyState.IsKeyDown(Keys.Down) && oldKeyState.IsKeyDown(Keys.Up) && !keyState.IsKeyDown(Keys.Up) && !airborn)
+                            drawCrouchingTransition(keyState, oldKeyState);
+                    
+                        body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
+                    }
+                    else if (keyState.IsKeyDown(Keys.Down) && airborn)                                   // right left down & airborn// 
+                    {
+                        crouching = false;
+                        body.setCurrentActiveSprite((int)BodySpriteIndex.ShootDown);
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.Jump);
+                        if (!movementlock)
+                        {
+                            moveRight(gameTime);
+                            movementlock = true;
+                        }
+                    }
                     checkMidToUpConditions(keyState, oldKeyState);
                     checkUpToMidConditions(keyState, oldKeyState);
                 }
-                else
+                else                                                                                     // case for running right //
                 {
                     spriteFlipping = false;
+                    checkFacingLeft(keyState, oldKeyState);
                     setLegsOffsetFalse();
                     heroState = HeroStates.Running;
                     moveRight(gameTime);
+
                     body.setCurrentActiveSprite((int)BodySpriteIndex.Idle);
-                    legs.setCurrentActiveSprite((int)LegSpriteIndex.Running);                  
+                    legs.setCurrentActiveSprite((int)LegSpriteIndex.Running);  
+                
                     checkMidToUpConditions(keyState, oldKeyState);
                     checkUpToMidConditions(keyState, oldKeyState);
                 }
             }
-            if (keyState.IsKeyDown(Keys.Left)) // case for walking left and crouching //
+            if (keyState.IsKeyDown(Keys.Left)) // Left Key Check
             {
-                if (keyState.IsKeyDown(Keys.Down))
+                if (keyState.IsKeyDown(Keys.Down))                                                       //  Left & Down //
                 {
                     spriteFlipping = true;
+                    checkFacingRight(keyState, oldKeyState);
                     setLegsOffsetTrue();
-                    heroState = HeroStates.CrouchWalking;
-                    moveLeft(gameTime);
-                    body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
-                    if(!keyState.IsKeyDown(Keys.Right))
+                    
+                    // Crouching Transition //
+                    if (!oldKeyState.IsKeyDown(Keys.Down) && keyState.IsKeyDown(Keys.Down) && !airborn)
+                        drawCrouchingTransition(keyState, oldKeyState);
+                    else if (keyState.IsKeyDown(Keys.Down) && oldKeyState.IsKeyDown(Keys.Up) && !keyState.IsKeyDown(Keys.Up) && !airborn)
+                        drawCrouchingTransition(keyState, oldKeyState); // CASE FOR LOOKING UP, THEN PRESS CROUCH, THEN LET GO OF LOOKING UP // 
+
+                    if (!keyState.IsKeyDown(Keys.Right) && !airborn)                                    // Left Down And Not Airborn //
+                    {
+                        crouching = true;
+                        heroState = HeroStates.CrouchWalking;
+                        body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
                         legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchWalk);
-                    else
+                        moveLeft(gameTime);
+                    }
+                    if(keyState.IsKeyDown(Keys.Right) && !airborn)                                 // Left Down Right and Not Airborn// 
+                    {
+                        crouching = true;
+                        heroState = HeroStates.CrouchStill;
+                        body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
                         legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
 
-                    //checkMidToUpConditions(keyState, oldKeyState);
-                    //checkUpToMidConditions(keyState, oldKeyState);
-                }
-                else if (keyState.IsKeyDown(Keys.Right))
-                {
-                    crouching = false;
-                     
-                     
-                    heroState = HeroStates.StandStill;
-                    body.setCurrentActiveSprite((int)BodySpriteIndex.Idle);
-                    if(!keyState.IsKeyDown(Keys.Down))
-                        legs.setCurrentActiveSprite((int)LegSpriteIndex.Idle);
-                    else
-                        legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
-
+                    }
+                    if (!keyState.IsKeyDown(Keys.Right) && airborn)                                // Left Down Jumping //
+                    {
+                        crouching = false;
+                        body.setCurrentActiveSprite((int)BodySpriteIndex.ShootDown);
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.Jump);
+                        if (!movementlock)
+                        {
+                            moveLeft(gameTime);
+                            movementlock = true;
+                        }
+                    }
+                    if (keyState.IsKeyDown(Keys.Right) && airborn)                                 // Left Down Right And Airborn //
+                    {
+                        crouching = false;
+                        body.setCurrentActiveSprite((int)BodySpriteIndex.ShootDown);
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.Jump);
+                        if (!movementlock)
+                        {
+                            moveLeft(gameTime);
+                            movementlock = true;
+                        }
+                    }
                     checkMidToUpConditions(keyState, oldKeyState);
                     checkUpToMidConditions(keyState, oldKeyState);
                 }
-                else
+                else if (keyState.IsKeyDown(Keys.Right))                                                // Left & Right //
+                {
+                    if (!keyState.IsKeyDown(Keys.Down) && !airborn)                                     // Right Left  Only //
+                    {
+                        crouching = false;
+                        heroState = HeroStates.StandStill;
+                        body.setCurrentActiveSprite((int)BodySpriteIndex.Idle);
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.Idle);
+                    }
+                    else if (keyState.IsKeyDown(Keys.Down) && !airborn)                                 // Right Left Down Grounded //
+                    {
+                        crouching = true;
+                        heroState = HeroStates.CrouchStill;
+                        body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
+                    }
+                    else if (keyState.IsKeyDown(Keys.Down) && airborn)                                  // Left Right Down airborn //
+                    {
+                        crouching = true;
+                        heroState = HeroStates.CrouchStill;
+                        body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchIdle);
+                        legs.setCurrentActiveSprite((int)LegSpriteIndex.CrouchIdle);
+                        if (!movementlock)
+                        {
+                            moveRight(gameTime);
+                            movementlock = true;
+                        }
+                    }
+                    checkMidToUpConditions(keyState, oldKeyState);
+                    checkUpToMidConditions(keyState, oldKeyState);
+                }
+                else                                                                                    // Running //
                 {
                     spriteFlipping = true;
+                    checkFacingRight(keyState, oldKeyState);
                     setLegsOffsetTrue();
                     heroState = HeroStates.Running;
                   
                     moveLeft(gameTime);
                     body.setCurrentActiveSprite((int)BodySpriteIndex.Idle);
                     legs.setCurrentActiveSprite((int)LegSpriteIndex.Running);
-                     
 
                     checkMidToUpConditions(keyState, oldKeyState);
                     checkUpToMidConditions(keyState, oldKeyState);
                 }
             }
-        }
+           
+            //Shooting Animation Logic //
+            if (keyState.IsKeyDown(Keys.D) && !oldKeyState.IsKeyDown(Keys.D))
+            {
+                firing = true;
+                checkShootingStartTransition(keyState, oldKeyState);
+            }
+            else if (!keyState.IsKeyDown(Keys.D) && oldKeyState.IsKeyDown(Keys.D))
+            {
+                firing = false;
+                checkShootingEndTransition(keyState, oldKeyState);
+            }
+            else if(keyState.IsKeyDown(Keys.D) && oldKeyState.IsKeyDown(Keys.D))
+            {
+                if (crouching)
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchShoot);
+                else if (!crouching && !airborn && !keyState.IsKeyDown(Keys.Up))
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.Shoot);
+                else if (!crouching && !airborn && keyState.IsKeyDown(Keys.Up))
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.ShootUp);
+                else if (airborn && keyState.IsKeyDown(Keys.Down))
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.ShootDown);
+                else if (airborn && !keyState.IsKeyDown(Keys.Down) && !keyState.IsKeyDown(Keys.Up))
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.Shoot);
+                else if (airborn && !keyState.IsKeyDown(Keys.Down) && keyState.IsKeyDown(Keys.Up))
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.ShootUp);
+            }
 
+            // Magic Animation Logic //
+            if (keyState.IsKeyDown(Keys.A) && !oldKeyState.IsKeyDown(Keys.A))
+            {
+                firingmagic = true;
+                checkMagicStartTransition(keyState, oldKeyState);
+            }
+            else if (!keyState.IsKeyDown(Keys.A) && oldKeyState.IsKeyDown(Keys.A))
+            {
+                firingmagic = false;
+                checkMagicEndTransition(keyState, oldKeyState);
+            }
+            else if (keyState.IsKeyDown(Keys.A) && oldKeyState.IsKeyDown(Keys.A))
+            {
+                if (crouching)
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.CrouchMagic);
+                else if (!crouching && !airborn && !keyState.IsKeyDown(Keys.Up))
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.Magic);
+                else if (!crouching && !airborn && keyState.IsKeyDown(Keys.Up))
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.MagicUp);
+                else if (airborn && keyState.IsKeyDown(Keys.Down))
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.MagicDown);
+                else if (airborn && !keyState.IsKeyDown(Keys.Down) && !keyState.IsKeyDown(Keys.Up))
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.Magic);
+                else if (airborn && !keyState.IsKeyDown(Keys.Down) && keyState.IsKeyDown(Keys.Up))
+                    body.setCurrentActiveSprite((int)BodySpriteIndex.MagicUp);
+            }
+
+        }
 
 
         private void handleFalling(GameTime gameTime)
@@ -382,13 +539,17 @@ namespace PLSE_Project.Interfaces
                     airborn = false;
                     doubleJumping = false;
                     jumpAcceleration = 0;
+                    jumpsLeft = 2;
                 }
                 else
                 {
                     if (!falling && jumpAcceleration < 0) // highest point of jump
                         falling = true;
                     if (!airborn)
+                    {
                         airborn = true;
+                        crouching = false;
+                    }
                     if (jumpAcceleration < -40)
                         jumpAcceleration = -40;
                     else if (jumpAcceleration > -40)
@@ -472,18 +633,50 @@ namespace PLSE_Project.Interfaces
             }
         }
 
-        private void shiftY(float amount, double elapsedTime)
-        {
-            //rect.Y += (int)(amount * elapsedTime);
-            //origin = new Vector2(rect.Center.X, rect.Center.Y);
 
-            body.position.Y += (int)(amount * elapsedTime);
-            legs.position.Y += (int)(amount * elapsedTime);
-             
+        public static void setX(int x)
+        {
+            body.setXPos(x);
+            legs.setXPos(x);
+            bodyTransitions.setXPos(x);
+            legsTransitions.setXPos(x);
         }
+        public static void setY(int y)
+        {
+            body.setYPos(y);
+            legs.setYPos(y - 80);
+            bodyTransitions.setYPos(y);
+            legsTransitions.setYPos(y - 80);
+        }
+
+        public static double getHealth()
+        {
+            return health;
+        }
+        public static double getMaxHealth()
+        {
+            return maxHealth;
+        }
+        public static double getEnergy()
+        {
+            return energy;
+        }
+        public static double getMaxEnergy()
+        {
+            return maxEnergy;
+        }
+        public static void changeEnergy(double changeAmount)
+        {
+            energy += changeAmount;
+            if (energy > maxEnergy)
+                energy = maxEnergy;
+        }
+
+
         private void jump()
         {
             jumpAcceleration = 32;
+            jumpsLeft--;
         }
 
         public bool intersects(Rectangle rectangle)
@@ -512,25 +705,43 @@ namespace PLSE_Project.Interfaces
         {
             if (!crouching)
             {
-                if (!obstacle.intersects(standingHitbox))
+                for (int counter = 1; counter < movespeed; counter++)
                 {
-                    body.move(movespeed);
-                    legs.move(movespeed);
-                    bodyTransitions.move(movespeed);
-                    legsTransitions.move(movespeed);
+                    if (!obstacle.intersects(standingHitbox))
+                    {
+                        body.move(1);
+                        legs.move(1);
+                        bodyTransitions.move(1);
+                        legsTransitions.move(1);
+                    }
+                    else if (obstacle.getRect().Top + 20 > standingHitbox.Bottom)
+                    {
+                        body.move(1);
+                        legs.move(1);
+                        bodyTransitions.move(1);
+                        legsTransitions.move(1);
+                    }
                 }
-                else { }
             }
             else
             {
-                if (!obstacle.intersects(standingHitbox))
+                for (int counter = 1; counter < movespeed / 2; counter++)
                 {
-                    body.move(movespeed / 2);
-                    legs.move(movespeed / 2);
-                    bodyTransitions.move(movespeed / 2);
-                    legsTransitions.move(movespeed / 2);
+                    if (!obstacle.intersects(standingHitbox))
+                    {
+                        body.move(1);
+                        legs.move(1);
+                        bodyTransitions.move(1);
+                        legsTransitions.move(1);
+                    }
+                    else if (obstacle.getRect().Top + 20 > standingHitbox.Bottom)
+                    {
+                        body.move(1);
+                        legs.move(1);
+                        bodyTransitions.move(1);
+                        legsTransitions.move(1);
+                    }
                 }
-                else { }
             }
             facingRight = true;
         }
@@ -538,25 +749,43 @@ namespace PLSE_Project.Interfaces
         {
             if (!crouching)
             {
-                if (!obstacle.intersects(standingHitbox))
+                for (int counter = 1; counter < movespeed; counter++)
                 {
-                    body.move(-movespeed);
-                    legs.move(-movespeed);
-                    bodyTransitions.move(-movespeed);
-                    legsTransitions.move(-movespeed);
+                    if (!obstacle.intersects(standingHitbox))
+                    {
+                        body.move(-1);
+                        legs.move(-1);
+                        bodyTransitions.move(-1);
+                        legsTransitions.move(-1);
+                    }
+                    else if (obstacle.getRect().Top + 20 > standingHitbox.Bottom)
+                    {
+                        body.move(-1);
+                        legs.move(-1);
+                        bodyTransitions.move(-1);
+                        legsTransitions.move(-1);
+                    }
                 }
-                else { }
             }
             else
             {
-                if (!obstacle.intersects(standingHitbox))
+                for (int counter = 1; counter < movespeed / 2; counter++)
                 {
-                    body.move(-movespeed / 2);
-                    legs.move(-movespeed / 2);
-                    bodyTransitions.move(-movespeed / 2);
-                    legsTransitions.move(-movespeed / 2);
+                    if (!obstacle.intersects(standingHitbox))
+                    {
+                        body.move(-1);
+                        legs.move(-1);
+                        bodyTransitions.move(-1);
+                        legsTransitions.move(-1);
+                    }
+                    else if (obstacle.getRect().Top + 20 > standingHitbox.Bottom)
+                    {
+                        body.move(-1);
+                        legs.move(-1);
+                        bodyTransitions.move(-1);
+                        legsTransitions.move(-1);
+                    }
                 }
-                else { }
             }
             facingRight = false;
         }
@@ -592,6 +821,271 @@ namespace PLSE_Project.Interfaces
         static public void setLegNull()
         {
             currentLegTransition = LegTransitionIndex.NULL;
+        }
+
+
+        private void checkReloadTransition(KeyboardState keyState, KeyboardState oldKeyState)
+        {
+
+        }
+        private void drawReloadTransition(KeyboardState keyState, KeyboardState oldKeySate)
+        {
+
+        }
+
+        private void checkShootingStartTransition(KeyboardState keyState, KeyboardState oldKeySate)
+        {
+            if (crouching)
+            {
+                if (!oldKeySate.IsKeyDown(Keys.D))
+                    drawShootingTransition("shootcrouchstart");
+            }
+            else if (airborn)
+            {
+                if (!oldKeySate.IsKeyDown(Keys.D) && keyState.IsKeyDown(Keys.Down))
+                    drawShootingTransition("shootdownstart");
+                else
+                    drawShootingTransition("shootstart");
+            }
+            else if (keyState.IsKeyDown(Keys.Up))
+            {
+                if (!oldKeySate.IsKeyDown(Keys.D))
+                    drawShootingTransition("shootupstart");
+            }
+            else
+            {
+                if (!oldKeySate.IsKeyDown(Keys.D))
+                    drawShootingTransition("shootstart");
+            }
+            firing = true;
+        }
+        private void checkShootingEndTransition(KeyboardState keyState, KeyboardState oldKeySate)
+        {
+            if (crouching)
+            {
+                if (oldKeySate.IsKeyDown(Keys.D))
+                    drawShootingTransition("shootcrouchend");
+            }
+            else if (airborn)
+            {
+                if (oldKeySate.IsKeyDown(Keys.D) && keyState.IsKeyDown(Keys.Down))
+                    drawShootingTransition("shootdownend");
+            }
+            else if (keyState.IsKeyDown(Keys.Up))
+            {
+                if (oldKeySate.IsKeyDown(Keys.D))
+                    drawShootingTransition("shootupend");
+            }
+            else
+            {
+                if (oldKeySate.IsKeyDown(Keys.D))
+                    drawShootingTransition("shootend");
+            }
+            firing = false;
+        }
+
+       
+        private void checkMagicStartTransition(KeyboardState keyState, KeyboardState oldKeyState)
+        {
+            if (crouching)
+            {
+                if (!oldKeyState.IsKeyDown(Keys.A))
+                    drawShootingMagicTransition("magiccrouchstart");
+            }
+            else if (airborn)
+            {
+                if (!oldKeyState.IsKeyDown(Keys.A) && keyState.IsKeyDown(Keys.Down))
+                    drawShootingTransition("magicdownstart");
+                else
+                    drawShootingMagicTransition("magicstart");
+            }
+            else if (keyState.IsKeyDown(Keys.Up))
+            {
+                if (!oldKeyState.IsKeyDown(Keys.A))
+                    drawShootingMagicTransition("magicupstart");
+            }
+            else
+            {
+                if (!oldKeyState.IsKeyDown(Keys.A))
+                    drawShootingMagicTransition("magicstart");
+            }
+            firingmagic = true;
+        }
+        private void checkMagicEndTransition(KeyboardState keyState, KeyboardState oldKeyState)
+        {
+            if (crouching)
+            {
+                if (oldKeyState.IsKeyDown(Keys.A))
+                    drawShootingMagicTransition("magiccrouchend");
+            }
+            else if (airborn)
+            {
+                if (oldKeyState.IsKeyDown(Keys.A) && keyState.IsKeyDown(Keys.Down))
+                    drawShootingMagicTransition("magicdownend");
+            }
+            else if (keyState.IsKeyDown(Keys.Up))
+            {
+                if (oldKeyState.IsKeyDown(Keys.A))
+                    drawShootingMagicTransition("magicupend");
+            }
+            else
+            {
+                if (oldKeyState.IsKeyDown(Keys.A))
+                    drawShootingMagicTransition("magicend");
+            }
+            firingmagic = false;
+        }
+
+
+        private void drawShootingTransition(string startOrEnd)
+        {
+            if (startOrEnd.Equals("shootstart"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.ShootStart;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.ShootStart);
+                setTransitionCheckStrings(startOrEnd);
+            }
+            else if (startOrEnd.Equals("shootend"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.ShootEnd;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.ShootEnd);
+                setTransitionCheckStrings(startOrEnd);
+            }
+            else if (startOrEnd.Equals("shootupstart"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.ShootUpStart;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.ShootUpStart);
+                setTransitionCheckStrings(startOrEnd);
+            }
+            else if (startOrEnd.Equals("shootupend"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.ShootUpEnd;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.ShootUpEnd);
+                setTransitionCheckStrings(startOrEnd);
+            }
+            else if (startOrEnd.Equals("shootdownstart"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.ShootDownStart;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.ShootDownStart);
+                setTransitionCheckStrings(startOrEnd);
+            }
+            else if (startOrEnd.Equals("shootdownend"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.ShootDownEnd;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.ShootDownEnd);
+                setTransitionCheckStrings(startOrEnd);
+            }
+            else if (startOrEnd.Equals("shootcrouchstart"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.ShootCrouchStart;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.ShootCrouchStart);
+                setTransitionCheckStrings(startOrEnd);
+            }
+            else if (startOrEnd.Equals("shootcrouchend"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.ShootCrouchEnd;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.ShootCrouchEnd);
+                setTransitionCheckStrings(startOrEnd);
+            }
+        }
+        private void drawShootingMagicTransition(string startOrEnd)
+        {
+            if (startOrEnd.Equals("magicstart"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.MagicStart;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.MagicStart);
+                setTransitionCheckStrings(startOrEnd);
+            }
+            else if (startOrEnd.Equals("magicend"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.MagicEnd;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.MagicEnd);
+                setTransitionCheckStrings(startOrEnd);
+            }
+            else if (startOrEnd.Equals("magicupstart"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.MagicUpStart;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.MagicUpStart);
+                setTransitionCheckStrings(startOrEnd);
+            }
+            else if (startOrEnd.Equals("magicupend"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.MagicUpEnd;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.MagicUpEnd);
+                setTransitionCheckStrings(startOrEnd);
+            }
+            else if (startOrEnd.Equals("magicdownstart"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.MagicDownStart;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.MagicDownStart);
+                setTransitionCheckStrings(startOrEnd);
+            }
+            else if (startOrEnd.Equals("magicdownend"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.MagicDownEnd;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.MagicDownEnd);
+                setTransitionCheckStrings(startOrEnd);
+            }
+            else if (startOrEnd.Equals("magiccrouchstart"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.MagicCrouchStart;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.MagicCrouchStart);
+                setTransitionCheckStrings(startOrEnd);
+            }
+            else if (startOrEnd.Equals("magiccrouchend"))
+            {
+                legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+                bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+
+                currentBodyTransition = BodyTransitionIndex.MagicCrouchEnd;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.MagicCrouchEnd);
+                setTransitionCheckStrings(startOrEnd);
+            }
         }
 
         private void drawCrouchingTransition(KeyboardState keyState, KeyboardState oldKeySate)
@@ -641,10 +1135,10 @@ namespace PLSE_Project.Interfaces
         {
             if (keyState.IsKeyDown(Keys.Up))
             {
+                facingUp = true;
+
                 if (!oldKeyState.IsKeyDown(Keys.Up))
-                {
                     drawMidToUpTransition(keyState, oldKeyState);
-                }
                 else
                     body.setCurrentActiveSprite((int)BodySpriteIndex.IdleUp);
             }
@@ -666,10 +1160,53 @@ namespace PLSE_Project.Interfaces
                 if (!oldKeyState.IsKeyUp(Keys.Up))
                 {
                     drawUpToMidTransition(keyState, oldKeyState);
+                    facingUp = false;
                 }
             }
         }
-        
+
+        private void drawTurningTransition(KeyboardState keyState, KeyboardState oldKeyState)
+        {
+            bodyTransitions.animationCounter[bodyTransitions.currentActiveSprite] = 0;
+            legsTransitions.animationCounter[legsTransitions.currentActiveSprite] = 0;
+
+            if (!crouching && !facingUp)
+            {
+                currentBodyTransition = BodyTransitionIndex.Turn;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.Turn);
+                setTransitionCheckStrings("turntransition");
+
+            }
+            else if(crouching && !facingUp)
+            {
+                currentBodyTransition = BodyTransitionIndex.CrouchTurn;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.CrouchTurn);
+                setTransitionCheckStrings("crouchturntransition");
+            }
+            else if (facingUp && !crouching)
+            {
+                currentBodyTransition = BodyTransitionIndex.TurnUp;
+                bodyTransitions.setCurrentActiveSprite((int)BodyTransitionIndex.TurnUp);
+                setTransitionCheckStrings("turnuptransition");
+            }
+
+        }
+        private void checkFacingLeft(KeyboardState keyState, KeyboardState oldKeyState)
+        {
+            if (!facingRight)
+            {
+                facingRight = true;
+                drawTurningTransition(keyState, oldKeyState);
+            }
+        }
+        private void checkFacingRight(KeyboardState keyState, KeyboardState oldKeyState)
+        {
+            if (facingRight)
+            {
+                facingRight = false;
+                drawTurningTransition(keyState, oldKeyState);
+            }
+        }
 
         private void setBodyHardCodedVals() 
         {
@@ -788,40 +1325,76 @@ namespace PLSE_Project.Interfaces
         }
         private void setBodyTransitionHardCodedValues()
         {
-            amountOfSheets = 15; // this is for the TOTAL amount of sheets that wil be loaded (this number will obviously increase over time as different animations will be needed) //
-
+            amountOfSheets = 33; // this is for the TOTAL amount of sheets that wil be loaded (this number will obviously increase over time as different animations will be needed) //
+            
             imgPaths[(int)BodyTransitionIndex.Crouch] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_crouch";
-            imgPaths[(int)BodyTransitionIndex.CrouchHolster] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_crouchholster"; // new
-            imgPaths[(int)BodyTransitionIndex.CrouchTurn] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_crouchturn"; 
-            //imgPaths[(int)BodyTransitionIndex.CrouchUnHolster] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_crouchunholster";// new
+            imgPaths[(int)BodyTransitionIndex.CrouchHolster] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_crouchholster";
+            imgPaths[(int)BodyTransitionIndex.CrouchTurn] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_crouchturn";
+            imgPaths[(int)BodyTransitionIndex.GrabLedge] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_grabledge";
             imgPaths[(int)BodyTransitionIndex.Hoist] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_hoist";
             imgPaths[(int)BodyTransitionIndex.Holster] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_holster";
+            imgPaths[(int)BodyTransitionIndex.HolsterDown] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_holsterdown";
+            imgPaths[(int)BodyTransitionIndex.HolsterUp] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_holsterup";
+            imgPaths[(int)BodyTransitionIndex.LetGo] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_letgo";
             imgPaths[(int)BodyTransitionIndex.LowToMid] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_lowtomid";
+            imgPaths[(int)BodyTransitionIndex.MagicCrouchEnd] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_magiccrouchend";
+            imgPaths[(int)BodyTransitionIndex.MagicCrouchStart] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_magiccrouchstart";
+            imgPaths[(int)BodyTransitionIndex.MagicDownEnd] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_magicdownend";
+            imgPaths[(int)BodyTransitionIndex.MagicDownStart] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_magicdownstart";
+            imgPaths[(int)BodyTransitionIndex.MagicEnd] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_magicend";
+            imgPaths[(int)BodyTransitionIndex.MagicStart] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_magicstart";
+            imgPaths[(int)BodyTransitionIndex.MagicUpEnd] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_magicupend";
+            imgPaths[(int)BodyTransitionIndex.MagicUpStart] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_magicupstart";
             imgPaths[(int)BodyTransitionIndex.MidToLow] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_midtolow";
             imgPaths[(int)BodyTransitionIndex.MidToUp] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_midtoup";
+            imgPaths[(int)BodyTransitionIndex.ShootCrouchEnd] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_shootcrouchend";
+            imgPaths[(int)BodyTransitionIndex.ShootCrouchStart] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_shootcrouchstart";
+            imgPaths[(int)BodyTransitionIndex.ShootDownEnd] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_shootdownend";
+            imgPaths[(int)BodyTransitionIndex.ShootDownStart] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_shootdownstart";
+            imgPaths[(int)BodyTransitionIndex.ShootEnd] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_shootend";
+            imgPaths[(int)BodyTransitionIndex.ShootStart] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_shootstart";
+            imgPaths[(int)BodyTransitionIndex.ShootUpEnd] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_shootupend";
+            imgPaths[(int)BodyTransitionIndex.ShootUpStart] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_shootupstart";
             imgPaths[(int)BodyTransitionIndex.Turn] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_turn";
+            imgPaths[(int)BodyTransitionIndex.TurnDown] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_turndown"; 
             imgPaths[(int)BodyTransitionIndex.TurnUp] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_turnup";
-            imgPaths[(int)BodyTransitionIndex.TurnDown] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_turndown"; // new
             imgPaths[(int)BodyTransitionIndex.UnCrouch] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_uncrouch";
-            //imgPaths[(int)BodyTransitionIndex.UnHolster] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_unholster";
             imgPaths[(int)BodyTransitionIndex.UpToMid] = "Sprites//Hero//MACHINE GUN//Transitions//machine_gun_uptomid";
 
-
             frameAmounts[(int)BodyTransitionIndex.Crouch] = 6;
+            frameAmounts[(int)BodyTransitionIndex.CrouchHolster] = 8;
             frameAmounts[(int)BodyTransitionIndex.CrouchTurn] = 4;
-            frameAmounts[(int)BodyTransitionIndex.CrouchHolster] = 8; 
-            frameAmounts[(int)BodyTransitionIndex.TurnDown] = 4; 
+            frameAmounts[(int)BodyTransitionIndex.GrabLedge] = 9;
             frameAmounts[(int)BodyTransitionIndex.Hoist] = 14;
             frameAmounts[(int)BodyTransitionIndex.Holster] = 8;
+            frameAmounts[(int)BodyTransitionIndex.HolsterDown] = 8;
+            frameAmounts[(int)BodyTransitionIndex.HolsterUp] = 8;
+            frameAmounts[(int)BodyTransitionIndex.LetGo] = 3;
             frameAmounts[(int)BodyTransitionIndex.LowToMid] = 4;
+            frameAmounts[(int)BodyTransitionIndex.MagicCrouchEnd] = 4;
+            frameAmounts[(int)BodyTransitionIndex.MagicCrouchStart] = 3;
+            frameAmounts[(int)BodyTransitionIndex.MagicDownEnd] = 5;
+            frameAmounts[(int)BodyTransitionIndex.MagicDownStart] = 3;
+            frameAmounts[(int)BodyTransitionIndex.MagicEnd] = 6;
+            frameAmounts[(int)BodyTransitionIndex.MagicStart] = 3;
+            frameAmounts[(int)BodyTransitionIndex.MagicUpEnd] = 5;
+            frameAmounts[(int)BodyTransitionIndex.MagicUpStart] = 3;
             frameAmounts[(int)BodyTransitionIndex.MidToLow] = 4;
-            frameAmounts[(int)BodyTransitionIndex.MidToUp]  = 4;
+            frameAmounts[(int)BodyTransitionIndex.MidToUp] = 4;
+            frameAmounts[(int)BodyTransitionIndex.ShootCrouchEnd] = 6;
+            frameAmounts[(int)BodyTransitionIndex.ShootCrouchStart] = 2;
+            frameAmounts[(int)BodyTransitionIndex.ShootDownEnd] = 6;
+            frameAmounts[(int)BodyTransitionIndex.ShootDownStart] = 2;
+            frameAmounts[(int)BodyTransitionIndex.ShootEnd] = 6;
+            frameAmounts[(int)BodyTransitionIndex.ShootStart] = 2;
+            frameAmounts[(int)BodyTransitionIndex.ShootUpEnd] = 6;
+            frameAmounts[(int)BodyTransitionIndex.ShootUpStart] = 2;
             frameAmounts[(int)BodyTransitionIndex.Turn] = 4;
+            frameAmounts[(int)BodyTransitionIndex.TurnDown] = 4;
             frameAmounts[(int)BodyTransitionIndex.TurnUp] = 4;
-            //frameAmounts[(int)BodyTransitionIndex.CrouchUnHolster] = 4; 
             frameAmounts[(int)BodyTransitionIndex.UnCrouch] = 6;
-            //frameAmounts[(int)BodyTransitionIndex.UnHolster] = 4;
             frameAmounts[(int)BodyTransitionIndex.UpToMid] = 4;
+            
 
             for (int counter = 0; counter < amountOfSheets; counter++)
             {
@@ -852,11 +1425,11 @@ namespace PLSE_Project.Interfaces
         }
         private void initalizeStagingArrays()
         {
-            frameAmounts = new int[25]; 
-            frameRects = new Rectangle[25];
-            imgPaths = new string[25];
+            frameAmounts = new int[35]; 
+            frameRects = new Rectangle[35];
+            imgPaths = new string[35];
             //startingPos = new Vector2[20];
-            spriteDelayTimes = new int[25];
+            spriteDelayTimes = new int[35];
         }
 
         public void passPlatform(Platform plat, Platform obs)

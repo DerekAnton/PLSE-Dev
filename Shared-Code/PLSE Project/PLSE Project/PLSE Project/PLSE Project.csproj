@@ -111,11 +111,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccelVec.cs" />
+    <Compile Include="Camera\Boundry.cs" />
+    <Compile Include="Camera\CameraManager.cs" />
+    <Compile Include="Camera\UIManager.cs" />
     <Compile Include="Direction.cs" />
     <Compile Include="Hero.cs" />
-    <Compile Include="Colideable.cs" />
     <Compile Include="BodyPart.cs" />
-    <Compile Include="Obstacle.cs" />
+    <Compile Include="Load&amp;Save\LevelReader.cs" />
+    <Compile Include="Load&amp;Save\XMLSaver.cs" />
+    <Compile Include="MapEntities\Colideable.cs" />
+    <Compile Include="MapEntities\Obstacle.cs" />
+    <Compile Include="MapEntities\ObstacleManager.cs" />
     <Compile Include="PhysicsManager.cs" />
     <Compile Include="Platform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -160,6 +166,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--
