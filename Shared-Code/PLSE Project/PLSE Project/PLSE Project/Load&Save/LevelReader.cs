@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using Microsoft.Xna.Framework.Content;
+using System.IO;
 
 namespace PLSE_Project
 {
@@ -17,9 +18,13 @@ namespace PLSE_Project
         private static int x, y, width, height, frames;
         private static string name, imgPath, imgDirectory, layer, itemType;
 
+        private static string[] test;
+
         public static void loadLevel(ContentManager content, int levelID)
         {
-            XmlTextReader reader = new XmlTextReader("Levels/Level" + levelID + ".xml");
+            string gamePath = getGameDirectory(test);
+
+            XmlTextReader reader = new XmlTextReader(gamePath + "\\Levels\\Level" + levelID + ".xml");
             while (reader.Read())
             {
                 switch (reader.NodeType)
@@ -106,6 +111,27 @@ namespace PLSE_Project
                     ObstacleManager.addCollisionRectangle(x, y, width, height);
                     break;
             }
+        }
+
+        private static String GetMyDocumentsDir()
+        {
+            return Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+        }
+
+        //tests to see if My Games exists in My Documents
+        private static string getGameDirectory(string[] args)
+        {
+            string directoryPath = GetMyDocumentsDir();
+            DirectoryInfo dirInfo = new DirectoryInfo(@directoryPath + "\\My Games\\PLSE Games");
+            
+            //if PLSE Games doesnt exist create the folder
+            if (!dirInfo.Exists)
+            {
+                XMLSaver.checkDirectory(test);
+                throw new System.NullReferenceException("No Level Data Found in " + directoryPath);
+            }
+
+            return directoryPath;
         }
     }
 }
