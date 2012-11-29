@@ -27,19 +27,23 @@ namespace PLSE_Project
             XmlTextReader reader = new XmlTextReader(gamePath + "\\Levels\\Level" + levelID + ".xml");
             while (reader.Read())
             {
+       
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
+                        
+                        Console.Out.Write(reader.Name + ": " + reader.Value);//reader.ReadElementContentAsString());//WORKING HERE
                         lastElementString = reader.Name;
                         break;
                     case XmlNodeType.Text:
-                        addVal(reader.Name);
+                        Console.Out.WriteLine(reader.Value);
+                        addVal(reader.ReadString());
                         break;
                     case XmlNodeType.EndElement:
                         buildObject(reader.Name, content);
                         break;
                     default:
-                        Console.WriteLine("Hit a weird XmlNodeType. It was of type: " + reader.NodeType);
+                        if(reader.NodeType != XmlNodeType.Whitespace) {Console.WriteLine("Hit a weird XmlNodeType. It was of type: " + reader.NodeType);}
                         break;
                 }
             }
@@ -47,6 +51,8 @@ namespace PLSE_Project
 
         private static void addVal(string val)
         {
+            if(!val.Equals(""))
+            {
             switch (lastElementString)
             {
                 case "X":
@@ -83,6 +89,7 @@ namespace PLSE_Project
                     Console.WriteLine("Something Went Horribly Wrong in File Loading Syntax!");
                     break;
             }
+            }
         }
 
         private static void buildObject(string elementName, ContentManager content)
@@ -96,7 +103,8 @@ namespace PLSE_Project
                     Hero.setX(x);
                     Hero.setY(y);
                     break;
-                case "Obstacle": //terrain/platforms/background
+                case "Terrain": //terrain/platforms/background
+                    Console.Out.WriteLine("Building Obstacle With ImgPath: " + imgPath);
                     ObstacleManager.addObstacle(content, imgPath, x, y, layer);
                     break;
                 case "Door": //Work on door code
@@ -130,6 +138,8 @@ namespace PLSE_Project
                 XMLSaver.checkDirectory(test);
                 throw new System.NullReferenceException("No Level Data Found in " + directoryPath);
             }
+            else
+                directoryPath += "\\My Games\\PLSE Games";
 
             return directoryPath;
         }

@@ -61,13 +61,13 @@ namespace PLSE_Project
             hero.passPlatform(floor, obstacle);
 
             hero.standingHitbox.X = (int)Hero.body.position.X - 70;
-            hero.standingHitbox.Y = (int)Hero.body.position.Y - 43;
+            hero.standingHitbox.Y = (int)Hero.body.position.Y -403;
 
             UIManager.load(Content);
 
             // For Camera logic currently causes errors so is commented out ~Jordan
-            //LevelReader.loadLevel(Content, 1);
-            //ObstacleManager.finishedLoading();
+            LevelReader.loadLevel(Content, 1);
+            ObstacleManager.finishedLoading();
         }
 
         protected override void UnloadContent()
@@ -90,7 +90,7 @@ namespace PLSE_Project
                 this.Exit();
 
 
-
+            ObstacleManager.update();
             hero.update(gameTime.ElapsedGameTime.Milliseconds, keyState, oldKeyState, viewportRect, gameTime); // Passed GameTime, The first parameter is only the first 16 miliseconds of the game that never updates...
             floor.update();
 
@@ -107,10 +107,14 @@ namespace PLSE_Project
 
             hero.updateHitboxes();
 
-            floor.draw(spriteBatch);
-            obstacle.draw(spriteBatch);
+            //floor.draw(spriteBatch);
+            //obstacle.draw(spriteBatch);
             hero.draw(spriteBatch);
             UIManager.draw(spriteBatch);
+
+            ObstacleManager.drawBackground(spriteBatch);
+            ObstacleManager.drawMidground(spriteBatch);
+            ObstacleManager.drawForeground(spriteBatch);
 
             // THIS IS FOR DEBUGGING HITBOXES , TAKE ME OUT //
             /*

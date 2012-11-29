@@ -10,8 +10,10 @@ namespace PLSE_Project
 {
     class ObstacleManager
     {
-        private static LinkedList<Obstacle> foreground, midground, background;
-        private static LinkedList<Rectangle> collisionRectsLoaded;
+        private static LinkedList<Obstacle> foreground = new LinkedList<Obstacle>();
+        private static LinkedList<Obstacle> midground = new LinkedList<Obstacle>();
+        private static LinkedList<Obstacle> background = new LinkedList<Obstacle>();
+        private static LinkedList<Rectangle> collisionRectsLoaded = new LinkedList<Rectangle>();
         private static Rectangle[] collisionRectsOrignal, collisionRectsShifted;
 
         public static void addObstacle(ContentManager content, string imgPath, int x, int y, string layer)
@@ -19,15 +21,16 @@ namespace PLSE_Project
             switch (layer)
             {
                 case "Foreground":
-                    foreground.AddLast(new Obstacle(x, y, imgPath, content));
+                    foreground.AddFirst(new Obstacle(x, y, imgPath, content));
                     break;
                 case "Midground":
-                    midground.AddLast(new Obstacle(x, y, imgPath, content));
+                    midground.AddFirst(new Obstacle(x, y, imgPath, content));
                     break;
                 case "Background":
-                    background.AddLast(new Obstacle(x, y, imgPath, content));
+                    background.AddFirst(new Obstacle(x, y, imgPath, content));
                     break;
                 default:
+                    Console.Out.WriteLine("Obstacles are being added to a plane that does not exist.");
                     break;
             }
         }
@@ -68,7 +71,7 @@ namespace PLSE_Project
 
         public static void drawMidground(SpriteBatch spriteBatch)
         {
-            foreach (Obstacle ob in foreground)
+            foreach (Obstacle ob in midground)
             {
                 if (ob.isOnScreen())
                     ob.draw(spriteBatch);
@@ -86,7 +89,8 @@ namespace PLSE_Project
 
         public static void addCollisionRectangle(int x, int y, int width, int height)
         {
-            collisionRectsLoaded.AddFirst(new Rectangle(x, y, width, height));
+            Rectangle tempRect = new Rectangle(x, y, width, height);
+            collisionRectsLoaded.AddFirst(tempRect);
         }
         public static void addCollisionRectangle(Rectangle rect)
         {
