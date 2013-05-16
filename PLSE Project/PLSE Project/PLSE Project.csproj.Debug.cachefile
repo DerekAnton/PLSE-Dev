@@ -1,0 +1,251 @@
+Content\Sprites\Hero\PISTOL\pistol_idledown.xnb
+Content\Sprites\Hero\LEGS\Transitions\crouch.xnb
+Content\Sprites\Hero\LEGS\Transitions\uncrouch.xnb
+Content\Sprites\Hero\LEGS\crouchwalk.xnb
+Content\Sprites\Hero\LEGS\fall.xnb
+Content\Sprites\Hero\LEGS\gethurt.xnb
+Content\Sprites\Hero\LEGS\idle.xnb
+Content\Sprites\Hero\LEGS\jump.xnb
+Content\Sprites\Hero\LEGS\running.xnb
+Content\Sprites\platform.xnb
+Content\Sprites\obstacle.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_crouch.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_crouchholster.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_crouchturn.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_grabledge.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_hoist.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_holster.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_holsterdown.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_holsterup.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_letgo.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_lowtomid.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_magiccrouchend.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_magiccrouchstart.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_magicdownend.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_magicdownstart.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_magicend.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_magicstart.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_magicupend.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_magicupstart.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_midtolow.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_midtoup.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_shootcrouchend.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_shootcrouchstart.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_shootdownend.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_shootdownstart.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_shootend.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_shootstart.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_shootupend.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_shootupstart.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_turn.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_turndown.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_turnup.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_uncrouch.xnb
+Content\Sprites\Hero\MACHINE GUN\Transitions\machine_gun_uptomid.xnb
+Content\Sprites\Hero\PISTOL\pistol_crouchidle.xnb
+Content\Sprites\Hero\PISTOL\pistol_crouchmagic.xnb
+Content\Sprites\Hero\PISTOL\pistol_crouchreload.xnb
+Content\Sprites\Hero\PISTOL\pistol_crouchshoot.xnb
+Content\Sprites\Hero\PISTOL\pistol_fall.xnb
+Content\Sprites\Hero\PISTOL\pistol_gethurt.xnb
+Content\Sprites\Hero\PISTOL\pistol_hangidle.xnb
+Content\Sprites\Hero\PISTOL\pistol_idle.xnb
+Content\Sprites\Hero\PISTOL\pistol_idleup.xnb
+Content\Sprites\Hero\PISTOL\pistol_jump.xnb
+Content\Sprites\Hero\PISTOL\pistol_magic.xnb
+Content\Sprites\Hero\PISTOL\pistol_magicdown.xnb
+Content\Sprites\Hero\PISTOL\pistol_magicup.xnb
+Content\Sprites\Hero\PISTOL\pistol_pulltowards.xnb
+Content\Sprites\Hero\PISTOL\pistol_pushaway.xnb
+Content\Sprites\Hero\PISTOL\pistol_reload.xnb
+Content\Sprites\Hero\PISTOL\pistol_reloadup.xnb
+Content\Sprites\Hero\PISTOL\pistol_shoot.xnb
+Content\Sprites\Hero\PISTOL\pistol_shootdown.xnb
+Content\Sprites\Hero\PISTOL\pistol_shootup.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_crouch.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_crouchholster.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_crouchturn.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_grabledge.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_hoist.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_holster.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_holsterdown.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_holsterup.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_letgo.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_lowtomid.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_magiccrouchstart.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_magicdownend.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_magicdownstart.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_magicend.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_magicstart.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_magicupend.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_magicupstart.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_midtolow.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_midtoup.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_turn.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_turndown.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_turnup.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_uncrouch.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_uptomid.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_crouchidle.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_crouchmagic.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_crouchreload.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_crouchshoot.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_fall.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_gethurt.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_hangidle.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_idle.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_idleup.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_jump.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_magic.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_magicdown.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_magicup.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_pulltowards.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_pushaway.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_reload.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_reloadup.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_shoot.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_shootdown.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_shootup.xnb
+Content\Sprites\UI\EnergyBarBack.xnb
+Content\Sprites\UI\EnergyBarFront.xnb
+Content\Sprites\UI\HealthBarBack.xnb
+Content\Sprites\UI\HealthBarFront.xnb
+Content\Sprites\Hero\MACHINE GUN\machine_gun_idledown.xnb
+Content\Sprites\Hero\ROCKET\rckt_crouchidle.xnb
+Content\Sprites\Hero\ROCKET\rckt_crouchmagic.xnb
+Content\Sprites\Hero\ROCKET\rckt_crouchreload.xnb
+Content\Sprites\Hero\ROCKET\rckt_crouchshoot.xnb
+Content\Sprites\Hero\ROCKET\rckt_fall.xnb
+Content\Sprites\Hero\ROCKET\rckt_gethurt.xnb
+Content\Sprites\Hero\ROCKET\rckt_hangidle.xnb
+Content\Sprites\Hero\ROCKET\rckt_idle.xnb
+Content\Sprites\Hero\ROCKET\rckt_idleup.xnb
+Content\Sprites\Hero\ROCKET\rckt_jump.xnb
+Content\Sprites\Hero\ROCKET\rckt_magic.xnb
+Content\Sprites\Hero\ROCKET\rckt_magicdown.xnb
+Content\Sprites\Hero\ROCKET\rckt_magicup.xnb
+Content\Sprites\Hero\ROCKET\rckt_pulltowards.xnb
+Content\Sprites\Hero\ROCKET\rckt_pushaway.xnb
+Content\Sprites\Hero\ROCKET\rckt_reload.xnb
+Content\Sprites\Hero\ROCKET\rckt_reloadup.xnb
+Content\Sprites\Hero\ROCKET\rckt_shoot.xnb
+Content\Sprites\Hero\ROCKET\rckt_shootdown.xnb
+Content\Sprites\Hero\ROCKET\rckt_shootup.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_crouch.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_crouchholster.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_crouchturn.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_grabledge.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_holster.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_holsterdown.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_holsterup.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_letgo.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_lowtomid.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_magicdownend.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_magicdownstart.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_magicend.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_magicstart.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_magicupend.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_magicupstart.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_midtolow.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_midtoup.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_turn.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_turndown.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_turnup.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_uncrouch.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_uptomid.xnb
+Content\Sprites\Hero\ROCKET\rckt_idledown.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_magiccrouchend.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_shootcrouchend.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_shootcrouchstart.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_shootdownend.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_shootdownstart.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_shootend.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_shootstart.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_shootupend.xnb
+Content\Sprites\Hero\PISTOL\Transitions\pistol_shootupstart.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_hoist.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_magiccrouchend.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_magiccrouchstart.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_shootcrouchend.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_shootcrouchstart.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_shootdownend.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_shootdownstart.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_shootend.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_shootstart.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_shootupend.xnb
+Content\Sprites\Hero\ROCKET\Transitions\rckt_shootupstart.xnb
+Content\Sprites\UI\acid_icon.xnb
+Content\Sprites\UI\health_chunk.xnb
+Content\Sprites\UI\health_icon.xnb
+Content\Sprites\UI\machine_bullet.xnb
+Content\Sprites\UI\machine_bullet_grey.xnb
+Content\Sprites\UI\machine_icon.xnb
+Content\Sprites\UI\pistol_bullet.xnb
+Content\Sprites\UI\pistol_bullet_grey.xnb
+Content\Sprites\UI\pistol_icon.xnb
+Content\Sprites\UI\pistol_ininity.xnb
+Content\Sprites\UI\rocket_bullet.xnb
+Content\Sprites\UI\rocket_bullet_grey.xnb
+Content\Sprites\UI\rocket_icon.xnb
+Content\Sprites\rectangle.xnb
+Content\Sprites\Enemies\GroundPatroller\die.xnb
+Content\Sprites\Enemies\GroundPatroller\explode.xnb
+Content\Sprites\Enemies\GroundPatroller\lefttoright.xnb
+Content\Sprites\Enemies\GroundPatroller\righttoleft.xnb
+Content\Sprites\Enemies\GroundPatroller\walkleft.xnb
+Content\Sprites\Enemies\GroundPatroller\walkright.xnb
+Content\Sprites\Enemies\BloatSack\explodeleft.xnb
+Content\Sprites\Enemies\BloatSack\exploderight.xnb
+Content\Sprites\Enemies\BloatSack\idle.xnb
+Content\Sprites\Backgrounds\jungle1.xnb
+Content\Sprites\Backgrounds\jungle2.xnb
+Content\Sprites\Projectiles\Guns\Rifle\mchgun_bullet.xnb
+Content\Sprites\Projectiles\Guns\Energy\acid1.xnb
+Content\Sprites\Projectiles\Guns\Energy\acid2.xnb
+Content\Sprites\Projectiles\Guns\Energy\acid3.xnb
+Content\Sprites\Projectiles\Guns\Energy\acidpop.xnb
+Content\Sprites\Projectiles\Guns\Pistol\pistol_splash.xnb
+Content\Sprites\Projectiles\Guns\Rckt\rocket_bullet.xnb
+Content\Sprites\Projectiles\Guns\Rckt\rocket_splash.xnb
+Content\Sprites\Projectiles\Guns\Rifle\mchgun_splash.xnb
+Content\Sprites\Projectiles\Guns\Pistol\pistol_bullet.xnb
+Content\Sprites\Terrain\Level1\FP1.xnb
+Content\Sprites\Terrain\Level1\FP2.xnb
+Content\Sprites\Terrain\Level1\FP3.xnb
+Content\Sprites\Terrain\Level1\FP4.xnb
+Content\Sprites\Terrain\Level1\FP5.xnb
+Content\Sprites\Terrain\Level1\T1.xnb
+Content\Sprites\Terrain\Level1\T10.xnb
+Content\Sprites\Terrain\Level1\T11.xnb
+Content\Sprites\Terrain\Level1\T12.xnb
+Content\Sprites\Terrain\Level1\T13.xnb
+Content\Sprites\Terrain\Level1\T14.xnb
+Content\Sprites\Terrain\Level1\T15.xnb
+Content\Sprites\Terrain\Level1\T16.xnb
+Content\Sprites\Terrain\Level1\T17.xnb
+Content\Sprites\Terrain\Level1\T18.xnb
+Content\Sprites\Terrain\Level1\T19.xnb
+Content\Sprites\Terrain\Level1\T2.xnb
+Content\Sprites\Terrain\Level1\T20.xnb
+Content\Sprites\Terrain\Level1\T21.xnb
+Content\Sprites\Terrain\Level1\T22.xnb
+Content\Sprites\Terrain\Level1\T23.xnb
+Content\Sprites\Terrain\Level1\T24.xnb
+Content\Sprites\Terrain\Level1\T25.xnb
+Content\Sprites\Terrain\Level1\T26.xnb
+Content\Sprites\Terrain\Level1\T27.xnb
+Content\Sprites\Terrain\Level1\T28.xnb
+Content\Sprites\Terrain\Level1\T3.xnb
+Content\Sprites\Terrain\Level1\T4.xnb
+Content\Sprites\Terrain\Level1\T5.xnb
+Content\Sprites\Terrain\Level1\T6.xnb
+Content\Sprites\Terrain\Level1\T7.xnb
+Content\Sprites\Terrain\Level1\T8.xnb
+Content\Sprites\Terrain\Level1\T9.xnb
+Content\Sprites\UI\acid_empty.xnb
+Content\Sprites\UI\acid_full.xnb
+Content\Fonts\temp.xnb
+Content\Sounds\shibboleth.xnb
+Content\Sounds\maidensword.xnb
+Content\Sounds\shibboleth.wma
+Content\Sounds\maidensword.wma
